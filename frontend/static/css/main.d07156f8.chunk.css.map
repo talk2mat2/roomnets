@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack://src/App.css"],"names":[],"mappings":"AAAA,mBACE,YAAa,CACb,cAAe,CACf,kBAAmB,CACnB,kBAAmB,CACnB,UACF","file":"main.d07156f8.chunk.css","sourcesContent":[".verticalCenterRow {\n  display: flex;\n  flex-wrap: wrap;\n  flex-direction: row;\n  align-items: center;\n  width: 100%;\n}\n"]}
