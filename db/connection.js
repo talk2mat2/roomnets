@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 require("dotenv").config('../.env');
 //var url = "mongodb://localhost:27017/martins";
-const url = `mongodb+srv://${process.env.MONGOUSER}:${process.env.MONGOPASS}@cluster0-gussd.mongodb.net/rooms?retryWrites=true&w=majority`;
-//const url = process.env.DATABASE_URL;
+//const url = `mongodb+srv://${process.env.MONGOUSER}:${process.env.MONGOPASS}@cluster0-gussd.mongodb.net/rooms?retryWrites=true&w=majority`;
+const url = process.env.DATABASE_URL;
 const connectDB = async () => {
   await mongoose.connect(
     url,
@@ -18,5 +18,4 @@ const connectDB = async () => {
 // gfs = Grid(conn.db, mongoose.mongo);
 // gfs.collection("photos");
 // exports.gfs = gfs;
-//
 module.exports = connectDB;
