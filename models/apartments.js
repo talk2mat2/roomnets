@@ -9,7 +9,7 @@ const Apartments = new Schema({
     no_toilets:String,
     media: [{ uri: String }],
     isPaidAdd: {type:Boolean,default:false},
-    paid_add: String,
+    // paid_add: String,
     location: {
         type: { type: String },
         coordinates: [Number],
@@ -39,6 +39,7 @@ const Apartments = new Schema({
     existing_room_mates: Object,
     new_room_mate: Object,
     advert_title: String,
+    currency:String,
     advert_description: String,
     post_code: String,
     posted_by:{

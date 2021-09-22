@@ -28,9 +28,11 @@ const {
   fetchHomepageModels,
   isUserRegistered,
   MediaImage,
+  countDocuments,
   ListApartByLocation,
   ListApartByLnglat,
   media,
+  uploadBanners,
   PostAddRooms,
   ListRoomsByState,
   PostAddApart,
@@ -89,5 +91,7 @@ Router.get("/ListRoomsByLocation", ListRoomsByLocation);
 Router.get("/ListApartByLocation", ListApartByLocation);
 Router.get("/ListRoomsByLnglat", ListRoomsByLnglat);
 Router.get("/ListApartByLnglat", ListApartByLnglat);
+Router.get("/countDocuments", countDocuments);
+Router.post("/uploadBanners", uploadBanners);
 
 module.exports = Router;

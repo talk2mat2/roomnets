@@ -633,6 +633,7 @@ exports.ListRoomsByLnglat = async (req, res) => {
           type: "Point",
           coordinates: [lng, lat],
         },
+        "maxDistance":1200000,//meters if search result disatcne
         key: "location",
         distanceField: "distance",
       },
@@ -650,6 +651,7 @@ exports.ListRoomsByLnglat = async (req, res) => {
           type: "Point",
           coordinates: [lng, lat],
         },
+        "maxDistance":1200000,//meters if search result disatcne
         key: "location",
         distanceField: "distance",
       },
@@ -661,7 +663,7 @@ exports.ListRoomsByLnglat = async (req, res) => {
   ]:[]
 // console.log(req.query.location)
   let total =await Rooms.aggregate(paramCount);
-  totalCount=total[0]["total"]
+  totalCount=total[0]?total[0]["total"] : 0
 
 
   await Rooms.aggregate(params).then(async(response) => {
@@ -705,6 +707,7 @@ exports.ListApartByLnglat = async (req, res) => {
           type: "Point",
           coordinates: [lng, lat],
         },
+        "maxDistance":1200000,//meters if search result disatcne
         key: "location",
         distanceField: "distance",
       },
@@ -722,6 +725,7 @@ exports.ListApartByLnglat = async (req, res) => {
           type: "Point",
           coordinates: [lng, lat],
         },
+        "maxDistance":1200000,//meters if search result disatcne
         key: "location",
         distanceField: "distance",
       },
@@ -732,7 +736,7 @@ exports.ListApartByLnglat = async (req, res) => {
   ]:[]
 // console.log(req.query.location)
   let total =await Apartments.aggregate(paramCount);
-  totalCount=total[0]["total"]
+  totalCount=total[0]?total[0]["total"] : 0
  
 
   await Apartments.aggregate(params).then(async(response) => {
@@ -753,4 +757,30 @@ exports.ListApartByLnglat = async (req, res) => {
       message: "emty result",
     });
   })
+}
+
+
+exports.countDocuments = async(req, res) => {
+  try {
+    const no_Rooms = await Rooms.estimatedDocumentCount()
+  const no_Apart = await Apartments.estimatedDocumentCount()
+    const no_Users = await UserSchema.estimatedDocumentCount()
+    return res.status(200).send({
+      status: true,
+      message: "Result Success",
+      userData:{no_Rooms,no_Apart,no_Users},
+    }); 
+
+  }
+  catch (error) {
+    return res.status(501).send({
+      status: false,
+      message: "Result failed",
+    userData:{no_Rooms:0,no_Apart:0,no_Users:0},
+    });
+  }
+
+}
+exports.uploadBanners = (req, res) => {
+  console.log(req)
 }

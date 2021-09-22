@@ -41,6 +41,7 @@ const Rooms = new Schema({
     advert_title: String,
     advert_description: String,
     post_code: String,
+    currency:String,
     posted_by:{
         type: Schema.Types.ObjectId,
         ref: 'Users'
