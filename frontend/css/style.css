@@ -3994,6 +3994,12 @@ background-color: rgba(44, 38, 30, 0.342);
 // Extra small devices (portrait phones, less than 576px)
 ============================================================*/
 @media (max-width: 575.98px){
+  .browse-cards{
+    width:90% !important;
+  }
+  .brosw-side-banner{
+    display: none;
+  }
   .px-60{
     padding-left: 50px;
     padding-right: 50px;

@@ -13,6 +13,7 @@ const fs = require("fs");
 // var child_process = require("child_process");
 const Grid = require("gridfs-stream");
 const mongoose = require("mongoose");
+// const homepageModel = require("../models/homepageModel");
 
 let gfs;
 const conn = mongoose.connection;
@@ -306,11 +307,12 @@ exports.UpdateHomepageModels = async (req, res) => {
   }
 };
 exports.fetchHomepageModels = async (req, res) => {
-  await HomepageModels.findOne({ videoUrl: { $exists: true, $ne: "" } })
+
+  await HomepageModels.findOne({ name:"home"})
     .then((response) => {
       return res.status(200).json({
         status: true,
-        message: "updated successfully",
+        message: "fetch was successful",
         userData: response,
       });
     })
@@ -347,14 +349,16 @@ exports.isUserRegistered = async (req, res) => {
     });
   }
 };
-exports.PostAddRooms = async(req, res) => {
+exports.PostAddRooms = async (req, res) => {
   console.log("file is", req.files.length);
   // const file = req.files;
   const { userData } = req.body;
   const DataInfo = JSON.parse(userData);
   let newFiles = new Array();
   for (const file of req.files) {
-    let img = { uri: `${process.env.WEB_URL}` + "/api/v1/media/" + file.filename };
+    let img = {
+      uri: `${process.env.WEB_URL}` + "/api/v1/media/" + file.filename,
+    };
     newFiles.push(img);
   }
   // console.log(newFiles);
@@ -386,27 +390,25 @@ exports.PostAddRooms = async(req, res) => {
 
   await newRooms.save((err, success) => {
     if (err) {
-      console.log(err)
+      console.log(err);
       return res.status(501).send({
         status: false,
         message: "lng/lat not provided",
       });
-    }
-    else {
+    } else {
       return res.status(201).send({
         status: true,
         message: "Addd Post was successful",
-        usadData:DataInfo
+        usadData: DataInfo,
       });
     }
-  })
+  });
 };
 
+// media server
 
-// media server 
-
-exports.media = async(req,res)=> {
-  const fileName = req.params.fileName
+exports.media = async (req, res) => {
+  const fileName = req.params.fileName;
 
   if (!fileName) {
     return res.status(501).send({
@@ -415,97 +417,114 @@ exports.media = async(req,res)=> {
     });
   }
   try {
-    const imageFile = fs.createReadStream(path.join(__dirname, "../upload/", fileName))
+    const imageFile = fs.createReadStream(
+      path.join(__dirname, "../upload/", fileName)
+    );
     imageFile.on("error", (error) => {
       return res.status(404).send({
         status: false,
         message: "image not found",
       });
-    })
+    });
 
-  return imageFile.pipe(res)
-  }
-  catch (err) {
+    return imageFile.pipe(res);
+  } catch (err) {
     return res.status(404).send({
       status: false,
       message: "image not found",
     });
   }
-
-}
+};
 
 //list rooms
-exports.ListRoomsByState=async(req,res)=> {
-  const params=req.params.state? { "building_location.address": { "$regex": req.params.state, "$options": "i" } }:{}
+exports.ListRoomsByState = async (req, res) => {
+  const params = req.params.state
+    ? {
+        "building_location.address": {
+          $regex: req.params.state,
+          $options: "i",
+        },
+      }
+    : {};
 
   let total = await Rooms.countDocuments({});
   const limit = 15;
 
   var pageNo = req.query.pageNo || 0;
 
-  var skip = pageNo * limit 
+  var skip = pageNo * limit;
 
-  await Rooms.find(params).populate('posted_by',"-Password").then((response) => {
-    
-    return res.status(200).send({
-      status: true,
-      message: "Search Result Success",
-      userData: response,
-      total: total,
-      limit: limit,
-
+  await Rooms.find(params)
+    .populate("posted_by", "-Password")
+    .then((response) => {
+      return res.status(200).send({
+        status: true,
+        message: "Search Result Success",
+        userData: response,
+        total: total,
+        limit: limit,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(404).send({
+        status: false,
+        message: "emty result",
+      });
     });
-  }).catch((err) => {
-    console.log(err)
-    return res.status(404).send({
-      status: false,
-      message: "emty result",
-    });
-  })
-}
+};
 //liat  Apartments
 exports.ListApartByState = async (req, res) => {
   let total = await Apartments.countDocuments({});
-  
+
   const limit = 15;
   // const params = {}
-  const params=req.params.state? { "building_location.address": { "$regex": req.params.state, "$options": "i" } }:{}
+  const params = req.params.state
+    ? {
+        "building_location.address": {
+          $regex: req.params.state,
+          $options: "i",
+        },
+      }
+    : {};
   var pageNo = req.query.pageNo || 0;
 
-  var skip = pageNo * limit 
+  var skip = pageNo * limit;
 
-  await Apartments.find(params).populate('posted_by',"-Password").limit(limit).then((response) => {
-    
-    return res.status(200).send({
-      status: true,
-      message: "Search Result Success",
-      userData:response,
-      total: total,
-      limit: limit,
-
+  await Apartments.find(params)
+    .populate("posted_by", "-Password")
+    .limit(limit)
+    .then((response) => {
+      return res.status(200).send({
+        status: true,
+        message: "Search Result Success",
+        userData: response,
+        total: total,
+        limit: limit,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(404).send({
+        status: false,
+        message: "emty result",
+      });
     });
-  }).catch((err) => {
-    console.log(err)
-    return res.status(404).send({
-      status: false,
-      message: "emty result",
-    });
-  })
-}
+};
 
-exports.PostAddApart = async(req, res) => {
+exports.PostAddApart = async (req, res) => {
   console.log("file is", req.files.length);
   // const file = req.files;
   const { userData } = req.body;
   const DataInfo = JSON.parse(userData);
-  console.log(DataInfo)
+  console.log(DataInfo);
   let newFiles = new Array();
   for (const file of req.files) {
-    let img = { uri: `${process.env.WEB_URL}` + "/api/v1/media/" + file.filename };
+    let img = {
+      uri: `${process.env.WEB_URL}` + "/api/v1/media/" + file.filename,
+    };
     newFiles.push(img);
   }
-
-
 
   const { building_location } = DataInfo;
   if (!building_location) {
@@ -534,81 +553,95 @@ exports.PostAddApart = async(req, res) => {
 
   await newApartments.save((err, success) => {
     if (err) {
-      console.log(err)
+      console.log(err);
       return res.status(501).send({
         status: false,
         message: "Unable to process the requested operation",
       });
-    }
-    else {
+    } else {
       return res.status(201).send({
         status: true,
         message: "Add Post was successful",
-        usadData:DataInfo
+        usadData: DataInfo,
       });
     }
-  })
-}
+  });
+};
 
-
-exports.ListRoomsByLocation=async(req,res)=> {
-  const params=req.query.location? { "building_location.address": { "$regex": req.query.location, "$options": "i" } }:{}
-// console.log(req.query.location)
+exports.ListRoomsByLocation = async (req, res) => {
+  const params = req.query.location
+    ? {
+        "building_location.address": {
+          $regex: req.query.location,
+          $options: "i",
+        },
+      }
+    : {};
+  // console.log(req.query.location)
   let total = await Rooms.countDocuments(params);
   const limit = 15;
 
   var pageNo = req.query.pageNo || 0;
 
-  var skip = pageNo * limit 
+  var skip = pageNo * limit;
 
-  await Rooms.find(params).populate('posted_by',"-Password").then((response) => {
-    
-    return res.status(200).send({
-      status: true,
-      message: "Search Result Success",
-      userData: response,
-      total: total,
-      limit: limit,
-
+  await Rooms.find(params)
+    .populate("posted_by", "-Password")
+    .then((response) => {
+      return res.status(200).send({
+        status: true,
+        message: "Search Result Success",
+        userData: response,
+        total: total,
+        limit: limit,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(404).send({
+        status: false,
+        message: "emty result",
+      });
     });
-  }).catch((err) => {
-    console.log(err)
-    return res.status(404).send({
-      status: false,
-      message: "emty result",
-    });
-  })
-}
+};
 
 //list apartments when a user search by address string
-exports.ListApartByLocation=async(req,res)=> {
-  const params=req.query.location? { "building_location.address": { "$regex": req.query.location, "$options": "i" } }:{}
-// console.log(req.query.location)
+exports.ListApartByLocation = async (req, res) => {
+  const params = req.query.location
+    ? {
+        "building_location.address": {
+          $regex: req.query.location,
+          $options: "i",
+        },
+      }
+    : {};
+  // console.log(req.query.location)
   let total = await Apartments.countDocuments(params);
   const limit = 15;
 
   var pageNo = req.query.pageNo || 0;
 
-  var skip = pageNo * limit 
+  var skip = pageNo * limit;
 
-  await Apartments.find(params).populate('posted_by',"-Password").then((response) => {
-    
-    return res.status(200).send({
-      status: true,
-      message: "Search Result Success",
-      userData: response,
-      total: total,
-      limit: limit,
-
+  await Apartments.find(params)
+    .populate("posted_by", "-Password")
+    .then((response) => {
+      return res.status(200).send({
+        status: true,
+        message: "Search Result Success",
+        userData: response,
+        total: total,
+        limit: limit,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(404).send({
+        status: false,
+        message: "emty result",
+      });
     });
-  }).catch((err) => {
-    console.log(err)
-    return res.status(404).send({
-      status: false,
-      message: "emty result",
-    });
-  })
-}
+};
 
 //list room  from lat longitidue when user supplies long lat
 exports.ListRoomsByLnglat = async (req, res) => {
@@ -618,73 +651,79 @@ exports.ListRoomsByLnglat = async (req, res) => {
       message: "longititude and latidue not provided",
     });
   }
-  const lng = parseInt(req.query.lng)
-  const lat = parseInt(req.query.lat)
+  const lng = parseInt(req.query.lng);
+  const lat = parseInt(req.query.lat);
   // console.log(typeof(lng))
   const limit = 15;
 
   var pageNo = req.query.pageNo || 0;
 
-  var skip = pageNo * limit 
-  const params=req.query.lng? [
-    {
-      $geoNear: {
-        near: {
-          type: "Point",
-          coordinates: [lng, lat],
+  var skip = pageNo * limit;
+  const params = req.query.lng
+    ? [
+        {
+          $geoNear: {
+            near: {
+              type: "Point",
+              coordinates: [lng, lat],
+            },
+            maxDistance: 1200000, //meters if search result disatcne
+            key: "location",
+            distanceField: "distance",
+          },
         },
-        "maxDistance":1200000,//meters if search result disatcne
-        key: "location",
-        distanceField: "distance",
-      },
-    },
-    { $limit: limit },
-    { $unset: "Password" },
-    { $skip : skip }
-   
-    // {$count:"total"},
-  ]:[]
-  const paramCount=req.query.lng? [
-    {
-      $geoNear: {
-        near: {
-          type: "Point",
-          coordinates: [lng, lat],
+        { $limit: limit },
+        { $unset: "Password" },
+        { $skip: skip },
+
+        // {$count:"total"},
+      ]
+    : [];
+  const paramCount = req.query.lng
+    ? [
+        {
+          $geoNear: {
+            near: {
+              type: "Point",
+              coordinates: [lng, lat],
+            },
+            maxDistance: 1200000, //meters if search result disatcne
+            key: "location",
+            distanceField: "distance",
+          },
         },
-        "maxDistance":1200000,//meters if search result disatcne
-        key: "location",
-        distanceField: "distance",
-      },
-    },
-    { $limit: 7 },
-    { $unset: "Password" },
-    { $count: "total" },
-   
-  ]:[]
-// console.log(req.query.location)
-  let total =await Rooms.aggregate(paramCount);
-  totalCount=total[0]?total[0]["total"] : 0
+        { $limit: 7 },
+        { $unset: "Password" },
+        { $count: "total" },
+      ]
+    : [];
+  // console.log(req.query.location)
+  let total = await Rooms.aggregate(paramCount);
+  totalCount = total[0] ? total[0]["total"] : 0;
 
+  await Rooms.aggregate(params)
+    .then(async (response) => {
+      const populated = await UserSchema.populate(response, {
+        path: "posted_by",
+        select: "-Password",
+      });
 
-  await Rooms.aggregate(params).then(async(response) => {
-    const populated = await UserSchema.populate(response,{path: 'posted_by',select: '-Password' })
-   
-    return res.status(200).send({
-      status: true,
-      message: "Search Result Success",
-      userData: populated,
-      total: totalCount,
-      limit: limit,
-
+      return res.status(200).send({
+        status: true,
+        message: "Search Result Success",
+        userData: populated,
+        total: totalCount,
+        limit: limit,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(404).send({
+        status: false,
+        message: "emty result",
+      });
     });
-  }).catch((err) => {
-    console.log(err)
-    return res.status(404).send({
-      status: false,
-      message: "emty result",
-    });
-  })
-}
+};
 exports.ListApartByLnglat = async (req, res) => {
   if (!req.query.lng || !req.query.lat) {
     return res.status(404).send({
@@ -692,95 +731,144 @@ exports.ListApartByLnglat = async (req, res) => {
       message: "longititude and latidue not provided",
     });
   }
-  const lng = parseInt(req.query.lng)
-  const lat = parseInt(req.query.lat)
+  const lng = parseInt(req.query.lng);
+  const lat = parseInt(req.query.lat);
   const limit = 15;
 
   var pageNo = req.query.pageNo || 0;
 
-  var skip = pageNo * limit 
+  var skip = pageNo * limit;
   // console.log(typeof(lng))
-  const params=req.query.lng? [
-    {
-      $geoNear: {
-        near: {
-          type: "Point",
-          coordinates: [lng, lat],
+  const params = req.query.lng
+    ? [
+        {
+          $geoNear: {
+            near: {
+              type: "Point",
+              coordinates: [lng, lat],
+            },
+            maxDistance: 1200000, //meters if search result disatcne
+            key: "location",
+            distanceField: "distance",
+          },
         },
-        "maxDistance":1200000,//meters if search result disatcne
-        key: "location",
-        distanceField: "distance",
-      },
-    },
-    { $limit: 7 },
-    { $unset: "Password" },
-    { $skip : skip }
-   
-    // {$count:"total"},
-  ]:[]
-  const paramCount=req.query.lng? [
-    {
-      $geoNear: {
-        near: {
-          type: "Point",
-          coordinates: [lng, lat],
+        { $limit: 7 },
+        { $unset: "Password" },
+        { $skip: skip },
+
+        // {$count:"total"},
+      ]
+    : [];
+  const paramCount = req.query.lng
+    ? [
+        {
+          $geoNear: {
+            near: {
+              type: "Point",
+              coordinates: [lng, lat],
+            },
+            maxDistance: 1200000, //meters if search result disatcne
+            key: "location",
+            distanceField: "distance",
+          },
         },
-        "maxDistance":1200000,//meters if search result disatcne
-        key: "location",
-        distanceField: "distance",
-      },
-    },
-    { $limit: 7 },
-    { $unset: "Password" },
-    {$count:"total"},
-  ]:[]
-// console.log(req.query.location)
-  let total =await Apartments.aggregate(paramCount);
-  totalCount=total[0]?total[0]["total"] : 0
- 
+        { $limit: 7 },
+        { $unset: "Password" },
+        { $count: "total" },
+      ]
+    : [];
+  // console.log(req.query.location)
+  let total = await Apartments.aggregate(paramCount);
+  totalCount = total[0] ? total[0]["total"] : 0;
 
-  await Apartments.aggregate(params).then(async(response) => {
-    const populated = await UserSchema.populate(response,{path: 'posted_by',select: '-Password' })
-   
-    return res.status(200).send({
-      status: true,
-      message: "Search Result Success",
-      userData: populated,
-      total: totalCount,
-      limit: limit,
+  await Apartments.aggregate(params)
+    .then(async (response) => {
+      const populated = await UserSchema.populate(response, {
+        path: "posted_by",
+        select: "-Password",
+      });
 
+      return res.status(200).send({
+        status: true,
+        message: "Search Result Success",
+        userData: populated,
+        total: totalCount,
+        limit: limit,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(404).send({
+        status: false,
+        message: "emty result",
+      });
     });
-  }).catch((err) => {
-    console.log(err)
-    return res.status(404).send({
-      status: false,
-      message: "emty result",
-    });
-  })
-}
+};
 
-
-exports.countDocuments = async(req, res) => {
+exports.countDocuments = async (req, res) => {
   try {
-    const no_Rooms = await Rooms.estimatedDocumentCount()
-  const no_Apart = await Apartments.estimatedDocumentCount()
-    const no_Users = await UserSchema.estimatedDocumentCount()
+    const no_Rooms = await Rooms.estimatedDocumentCount();
+    const no_Apart = await Apartments.estimatedDocumentCount();
+    const no_Users = await UserSchema.estimatedDocumentCount();
     return res.status(200).send({
       status: true,
       message: "Result Success",
-      userData:{no_Rooms,no_Apart,no_Users},
-    }); 
-
-  }
-  catch (error) {
+      userData: { no_Rooms, no_Apart, no_Users },
+    });
+  } catch (error) {
     return res.status(501).send({
       status: false,
       message: "Result failed",
-    userData:{no_Rooms:0,no_Apart:0,no_Users:0},
+      userData: { no_Rooms: 0, no_Apart: 0, no_Users: 0 },
     });
   }
-
-}
-exports.uploadBanners = (req, res) => {
-  console.log(req)
-}
+};
+exports.uploadBanners = async (req, res) => {
+  try {
+    let Banners = new Array();
+    // console.log(req.files);
+    for (const file of req.files) {
+      let img = {
+        uri: `${process.env.WEB_URL}` + "/api/v1/media/" + file.filename,
+      };
+      Banners.push(img);
+    }
+    // console.log(Banners);
+    const isHomeExist = await HomepageModels.findOne({ name: "home" });
+    if (isHomeExist) {
+      // console.log(isHomeExist)
+      await HomepageModels.findOneAndUpdate(
+        { name: "home" },
+        { Banners: Banners },
+        {
+          returnOriginal: false,
+          useFindAndModify: false,
+        }
+      ).then((response) => {
+        console.log("success");
+        return res.status(200).send({
+          status: true,
+          message: "Operation was successfull",
+          userData: response,
+        });
+      });
+    } else {
+      const newhomepageModel = new HomepageModels({
+        Banners: Banners,
+      });
+      await newhomepageModel.save();
+      return res.status(200).send({
+        status: true,
+        message: "Operation was successfull",
+        userData: newhomepageModel,
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(501).send({
+      status: false,
+      message:
+        "Operation failed, there was an error perfoming the requested operation",
+    });
+  }
+};

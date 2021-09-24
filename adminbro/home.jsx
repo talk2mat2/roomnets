@@ -9,7 +9,9 @@ const api = new ApiClient();
 const Dashboard = () => {
   const [data, setData] = useState({});
   const [ImageState, setImageState] = React.useState([]);
+  const [loading, setloading] = React.useState(false);
   const [count, setCount] = useState({ no_Apart: 0, no_Rooms: 0, no_Users: 0 });
+  const [banners, setBanners] = React.useState([]);
 
   const countDocuments = async () => {
     return await axios
@@ -17,16 +19,21 @@ const Dashboard = () => {
       .then((response) => response)
       .catch((err) => err);
   };
-  const UploadImagesDocuments = async (data) => {
+  const fetchHomepageModels = async () => {
     return await axios
-      .post(`/Api/v1/uploadBanners`, data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: token,
-        },
-      })
+      .get(`/api/v1/fetchHomepageModels`)
       .then((response) => response)
       .catch((err) => err);
+  };
+  const UploadImagesDocuments = async (data) => {
+    console.log(data);
+    // return await axios
+    //   .post(`/Api/v1/uploadBanners`, data, {
+    //     headers: {
+    //       "Content-Type": "multipart/form-data",
+    //       boundary: "MyBoundary",
+    //     },
+    //   })
   };
 
   function handleChange(event) {
@@ -36,7 +43,8 @@ const Dashboard = () => {
     if (
       event.target.files[0].type === "image/png" ||
       event.target.files[0].type === "image/jpg" ||
-      event.target.files[0].type === "image/jpeg"
+      event.target.files[0].type === "image/jpeg" ||
+      event.target.files[0].type === "image/gif"
     ) {
       if (event.target.files[0]) {
         const newImagestate = ImageState;
@@ -60,33 +68,72 @@ const Dashboard = () => {
       return alert("You must select at least one image or more");
     }
     var formData = new FormData();
-    formData.append("userData", JSON.stringify(Allresponse));
+
     for (let x = 0; x < ImageState.length; x++) {
       formData.append("file", ImageState[x]["Uri"]);
     }
-    UploadImagesDocuments(FormData);
+    // UploadImagesDocuments(FormData);
+    setloading(true);
+    await axios({
+      // url: `${ProxyUrl}/users/PreRegister`,
+      url: `/Api/v1/uploadBanners`,
+      method: "POST",
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+      .then((response) => {
+        setImageState([]);
+        setloading(false);
+        setBanners(response.data.userData.Banners);
+        // alert(response.data.message);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   const mapImagestate = () => {
     return ImageState.map((xx) => (
-      <div classNameName="col-3" style={{ margin: "10px" }}>
+      <div style={{ margin: "4px" }}>
         <img
           src={xx.file}
           alt="preview"
           style={{
-            maxHeight: "80px",
-            display: "block",
-            margin: "10px",
-            // maxWidth: "80px",
+            maxWidth: "20%",
+            maxHeight: "30%",
           }}
         />
       </div>
     ));
   };
 
-  useEffect(() => {
-    countDocuments().then((response) =>
-      setCount({ ...response.data.userData })
+  const mapBanners = () => {
+    return (
+      banners.length > 0 &&
+      banners.map((xx) => (
+        <div style={{ margin: "4px" }}>
+          <img
+            src={xx.uri}
+            alt="preview"
+            style={{
+              maxWidth: "20%",
+              maxHeight: "20%",
+            }}
+          />
+        </div>
+      ))
     );
+  };
+
+  useEffect(() => {
+    countDocuments()
+      .then((response) => setCount({ ...response.data.userData }))
+      .then(() =>
+        fetchHomepageModels().then((res) => {
+          setBanners(res.data.userData.Banners);
+        })
+      );
     api.getDashboard().then((response) => {
       setData(response.data);
     });
@@ -538,10 +585,27 @@ const Dashboard = () => {
         </section>
       </div>
       <form onSubmit={UploadNow}>
-        <Box variant="white"></Box>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "start",
+          }}
+        >
+          {mapBanners ? mapBanners() : null}
+        </div>
+
         <br />
         <Box variant="white">
-          <div style={{ display: "flex", flexDirection: "row" }}>
+          {loading ? <p>..Uploading</p> : null}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
             {mapImagestate()}
           </div>
           <br />
@@ -552,10 +616,19 @@ const Dashboard = () => {
           >
             Add Banners
           </h5>
+          <small className="sc-dIvqjp  sc-fKgIG">
+            <i>Select up to 2 images and click on upload</i>
+            <br />
+            <i>Image 1 size (landscape) 2088 px x 144 px</i>
+            <br />
+            <i>Image 2 size (portrait) 144 px x 2088 px </i>
+            <br />
+            <br />
+          </small>
           <input
             type="file"
             onChange={handleChange}
-            accept="image/x-png,image/jpeg"
+            accept="image/x-png,image/jpeg,image/gif"
           />
           <button
             type="submit"

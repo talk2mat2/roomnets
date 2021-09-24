@@ -92,6 +92,6 @@ Router.get("/ListApartByLocation", ListApartByLocation);
 Router.get("/ListRoomsByLnglat", ListRoomsByLnglat);
 Router.get("/ListApartByLnglat", ListApartByLnglat);
 Router.get("/countDocuments", countDocuments);
-Router.post("/uploadBanners", uploadBanners);
+Router.post("/uploadBanners",multerUpload.array('file'), uploadBanners);
 
 module.exports = Router;
