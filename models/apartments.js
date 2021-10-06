@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose
+const  {sendmail} =require( "../middlewares/mailer")
 
 
 
 const Apartments = new Schema({
     no_rooms: String,
-    amenities_private_toilets: Boolean,
+    Approved_By_Admin:{type:Boolean,default:false,enum:[true,false]},
+  
     no_toilets:String,
     media: [{ uri: String }],
     isPaidAdd: {type:Boolean,default:false},
@@ -23,6 +25,7 @@ const Apartments = new Schema({
     building_location: Object,
     street_name: String,
     rooms_avail_date: String,
+    amenities_private_toilets: Boolean,
     living_rooms: String,
     furnished_rooms: String,
     broker_agent_fee: String,
@@ -56,6 +59,24 @@ Apartments.pre("save", next => {
     this.updated_at = Date.now()
     next()
 })
+
+
+
+Apartments.pre('findOneAndUpdate', async function() {
+    const docToUpdate = await this.model.findOne(this.getQuery());
+    //console.log(docToUpdate.Approved_By_Admin); // The document that `findOneAndUpdate()` will modify
+    const modifiedFields = this.getUpdate()['$set']['Approved_By_Admin'];
+    // console.log(modifiedFields)
+    if (docToUpdate.Approved_By_Admin === false && modifiedFields === true) {
+        console.log("YOUR ADD HAS BEEN APPROVED BY ADMIN AND ITS VISSIBLE NOW" + docToUpdate.email)
+        try {
+            await sendmail(docToUpdate)
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+  });
 
 
 module.exports = mongoose.model("Apartments",Apartments)

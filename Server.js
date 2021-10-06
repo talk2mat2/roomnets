@@ -10,6 +10,8 @@ const Userschema= require("./models/userMoodel");
 const Rooms= require("./models/rooms");
 const Apartments= require("./models/apartments");
 const ContactMessage= require("./models/contactMessages");
+const Blogs= require("./models/blog");
+const Blogscomments= require("./models/BlogComments");
 const homepageModels= require("./models/homepageModel");
 const AdminBro = require('admin-bro')
 const AdminBroMongoose = require('@admin-bro/mongoose')
@@ -43,7 +45,7 @@ const adminBro = new AdminBro ({
   rootPath: '/admin',
   loginPath: '/admin/login',
   locale,
-  resources: [Userschema, Rooms, Apartments,ContactMessage,homepageModels],
+  resources: [Userschema, Rooms, Apartments,ContactMessage,homepageModels,Blogs,Blogscomments],
   branding: {
     companyName: "RoomNets",
     softwareBrothers: false,

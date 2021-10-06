@@ -29,6 +29,8 @@ const {
   isUserRegistered,
   MediaImage,
   countDocuments,
+  BlogById,
+  postComment,
   ListApartByLocation,
   ListApartByLnglat,
   media,
@@ -36,12 +38,16 @@ const {
   PostAddRooms,
   ListRoomsByState,
   PostAddApart,
+  LikeAPost,
   SyncronizeUserData,
   ListApartByState,
   updatePrivacy,
   contactForm,
   updateFaq,
-  updateAboutUs
+  updateAboutUs,
+  CreateBlog,
+  BlogPostAllRecent,
+  BlogPostAll
 } = require("../controllers/user");
 
 var storage = multer.diskStorage({
@@ -90,16 +96,23 @@ Router.get("/fetchHomepageModels", fetchHomepageModels);
 Router.get("/isUserRegistered/:email", isUserRegistered);
 Router.get("/media/:fileName", media);
 Router.get("/ListRoomsByState/:state", ListRoomsByState);
+Router.get("/BlogPostAll/:country", BlogPostAll);
+Router.get("/BlogById/:id", BlogById);
 Router.get("/ListApartByState/:state", ListApartByState);
 Router.get("/ListRoomsByLocation", ListRoomsByLocation);
 Router.get("/ListApartByLocation", ListApartByLocation);
 Router.get("/ListRoomsByLnglat", ListRoomsByLnglat);
+Router.get("/BlogPostAllRecent/:country", BlogPostAllRecent);
+Router.get("/LikeAPost/:postId",LoginbyJWT, LikeAPost);
 Router.get("/ListApartByLnglat", ListApartByLnglat);
 Router.get("/countDocuments", countDocuments);
 Router.post("/uploadBanners",multerUpload.array('file'), uploadBanners);
+Router.post("/createBlog",multerUpload.array('file'), CreateBlog);
 Router.post("/updatePrivacy",updatePrivacy );
 Router.post("/contactForm",contactForm);
 Router.post("/updateFaq",updateFaq);
-Router.post("/updateAboutUs",updateAboutUs);
+Router.post("/updateAboutUs", updateAboutUs);
+Router.post("/postComment",postComment);
+
 
 module.exports = Router;

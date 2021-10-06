@@ -3,7 +3,9 @@ const bcrypt = require("bcrypt");
 const UserSchema = require("../models/userMoodel");
 const ContactMessages = require("../models/contactMessages");
 const Rooms = require("../models/rooms");
+const Blog = require("../models/blog");
 const Apartments = require("../models/apartments");
+const BlogComments = require("../models/BlogComments");
 
 const HomepageModels = require("../models/homepageModel");
 
@@ -91,7 +93,7 @@ exports.Register = async (req, res) => {
   if (Password2 != Password) {
     return res.status(501).json({ message: "both password dont match" });
   }
-  console.log(firstName, lastName, email, Password, Password2);
+  // console.log(firstName, lastName, email, Password, Password2);
   if (!Password2 || !Password || !lastName || !firstName || !Email) {
     return res.status(501).json({
       message: "You didnt fill all values required,kindly try again",
@@ -324,8 +326,98 @@ exports.fetchHomepageModels = async (req, res) => {
       });
     });
 };
+exports.BlogPostAll = async (req, res) => {
+
+  const { country } = req.params
+;
+  if (!country) {
+    return res.status(501).send({
+      status: false,
+      message: "Country code not provided",
+    });
+  }
+  const total = await Blog.estimatedDocumentCount();
+var limit= 15
+  var pageNo = req.query.pageNo || 0;
+
+  var skip = pageNo * limit
+
+  await Blog.find({country:country}).skip(skip).limit(limit)
+    .then((response) => {
+      return res.status(200).json({
+        status: true,
+        message: "fetch was successful",
+        userData: response,
+        total: total,
+        limit: limit,
+        pageNo
+      });
+    })
+    .catch((error) => {
+      return res.status(501).send({
+        status: false,
+        message: "not found",
+      });
+    });
+};
+//get All REecent Post
+exports.BlogPostAllRecent = async (req, res) => {
+
+  const { country } = req.params
+// console.log(country)
+  if (!country) {
+    return res.status(501).send({
+      status: false,
+      message: "Country code not provided",
+    });
+  }
+  await Blog.find({country:country}).sort({id:-1})
+    .then((response) => {
+    // console.log(response)
+      return res.status(200).json({
+        status: true,
+        message: "fetch was successful",
+        userData: new Array(...response).slice(0,4), 
+      });
+    })
+    .catch((error) => {
+      return res.status(501).send({
+        status: false,
+        message: "not found",
+      });
+    });
+};
+
+exports.BlogById = async (req, res) => {
+
+  const { id } = req.params
+
+  if (!id) {
+    return res.status(501).send({
+      status: false,
+      message: "Country code not provided",
+    });
+  }
+  await Blog.findOne({ _id: id }).populate({path:"comments",model:"Blogcomments",populate:[{path:"commentedBy",model:"Users",select: 'firstName lastName'}]}).populate("comments.commentedBy")
+    .then((response) => {
+      return res.status(200).json({
+        status: true,
+        message: "fetch was successful",
+        userData: response, 
+      });
+    })
+    .catch((error) => {
+      return res.status(501).send({
+        status: false,
+        message: "not found",
+      });
+    });
+};
+
+
 
 //cherck if user is registered
+
 
 exports.isUserRegistered = async (req, res) => {
   const email = req.params.email;
@@ -351,7 +443,7 @@ exports.isUserRegistered = async (req, res) => {
   }
 };
 exports.PostAddRooms = async (req, res) => {
-  console.log("file is", req.files.length);
+  // console.log("file is", req.files.length);
   // const file = req.files;
   const { userData } = req.body;
   const DataInfo = JSON.parse(userData);
@@ -440,7 +532,7 @@ exports.media = async (req, res) => {
 //list rooms
 exports.ListRoomsByState = async (req, res) => {
   const params = req.params.state
-    ? {
+    ? {"Approved_By_Admin":true,
         "building_location.address": {
           $regex: req.params.state,
           $options: "i",
@@ -481,7 +573,7 @@ exports.ListApartByState = async (req, res) => {
   const limit = 15;
   // const params = {}
   const params = req.params.state
-    ? {
+    ? {"Approved_By_Admin":true,
         "building_location.address": {
           $regex: req.params.state,
           $options: "i",
@@ -518,7 +610,7 @@ exports.PostAddApart = async (req, res) => {
   // const file = req.files;
   const { userData } = req.body;
   const DataInfo = JSON.parse(userData);
-  console.log(DataInfo);
+  // console.log(DataInfo);
   let newFiles = new Array();
   for (const file of req.files) {
     let img = {
@@ -571,7 +663,7 @@ exports.PostAddApart = async (req, res) => {
 
 exports.ListRoomsByLocation = async (req, res) => {
   const params = req.query.location
-    ? {
+    ? {"Approved_By_Admin":true,
         "building_location.address": {
           $regex: req.query.location,
           $options: "i",
@@ -609,7 +701,7 @@ exports.ListRoomsByLocation = async (req, res) => {
 //list apartments when a user search by address string
 exports.ListApartByLocation = async (req, res) => {
   const params = req.query.location
-    ? {
+    ? {"Approved_By_Admin":true,
         "building_location.address": {
           $regex: req.query.location,
           $options: "i",
@@ -676,7 +768,7 @@ exports.ListRoomsByLnglat = async (req, res) => {
         { $limit: limit },
         { $unset: "Password" },
         { $skip: skip },
-
+        {$match:{"Approved_By_Admin":true}},
         // {$count:"total"},
       ]
     : [];
@@ -693,13 +785,16 @@ exports.ListRoomsByLnglat = async (req, res) => {
             distanceField: "distance",
           },
         },
-        { $limit: 7 },
+        // { $limit: 7 },
+        {$match:{"Approved_By_Admin":true}},
         { $unset: "Password" },
-        { $count: "total" },
+      { $count: "total" },
+     
       ]
     : [];
   // console.log(req.query.location)
   let total = await Rooms.aggregate(paramCount);
+  console.log(total)
   totalCount = total[0] ? total[0]["total"] : 0;
 
   await Rooms.aggregate(params)
@@ -756,7 +851,7 @@ exports.ListApartByLnglat = async (req, res) => {
         { $limit: 7 },
         { $unset: "Password" },
         { $skip: skip },
-
+        {$match:{"Approved_By_Admin":true}},
         // {$count:"total"},
       ]
     : [];
@@ -773,9 +868,11 @@ exports.ListApartByLnglat = async (req, res) => {
             distanceField: "distance",
           },
         },
-        { $limit: 7 },
+        // { $limit: 7 },
+        {$match:{"Approved_By_Admin":true}},
         { $unset: "Password" },
-        { $count: "total" },
+      { $count: "total" },
+     
       ]
     : [];
   // console.log(req.query.location)
@@ -1041,4 +1138,143 @@ exports.contactForm = async (req, res) => {
      
     });
   }
+}
+
+exports.CreateBlog = async (req, res) => {
+  // console.log("file is", req.files.length);
+  // const file = req.files;
+  const { userData } = req.body;
+  const{title,body,country} = JSON.parse(userData);
+ 
+
+  if (!title || !body || !country) {
+    return res.status(404).json({
+      status: false,
+      message: " All field s not supplied",
+    });
+  }
+
+  let newFiles = new Array();
+  if (req.files.length>0) {
+    for (const file of req.files) {
+      let img = {
+        uri: `${process.env.WEB_URL}` + "/api/v1/media/" + file.filename,
+      };
+      newFiles.push(img);
+    }
+  }
+  let params= req.files.length>0? {
+    title,body,country, imagUri:newFiles[0]['uri']
+  }: {
+    title,body,country
+  }
+
+  const newBlogPost = new Blog(params)
+  await newBlogPost.save((err, success) => {
+    if (err) {
+      console.log(err);
+      return res.status(501).send({
+        status: false,
+        message: "error saving the data",
+      });
+    } else {
+      return res.status(201).send({
+        status: true,
+        message: "Blog Post was successful",
+       
+      });
+    }
+  });
+   
+};
+
+exports.postComment =async (req, res) => {
+
+  const {
+    title,
+    body,
+    commentedBy,
+    comments_for_post
+  } = req.body
+  
+  if (!title || !body || !commentedBy || !comments_for_post) {
+    return res.status(501).send({
+      status: false,
+      message: "no title or body or comment id or current user id",
+    });
+  }
+
+  else {
+    try {
+      const newComment = new BlogComments({
+        body,title,commentedBy,comments_for_post
+      })
+      await newComment.save();
+      await Blog.findOne({ _id: comments_for_post }).then(async(post) => {
+        post.comments.push(newComment)
+        await post.save();
+    // return res.status(200).send({
+    //   status: true,
+    //   message: "Post was successfull",
+    // });
+        req['params']["id"] =comments_for_post
+        await this.BlogById(req,res)
+      })
+    }
+    catch (err) {
+      console.log(err)
+      return res.status(501).send({
+        status: false,
+        message: "An error occured: "+err,
+      });
+    }
+   
+  }
+}
+
+
+exports.LikeAPost = async (req, res) => {
+  
+  const id = req.body.id
+  const postId = req.params.postId
+ 
+  const BlogPost = await Blog.findOne({ _id: postId })
+
+  try {
+    if (BlogPost) {
+      var isInArray = BlogPost.likes.some(function (likes) {
+        return likes.equals(id);
+
+    })
+
+   
+      if (isInArray) {
+      
+      await BlogPost.likes.pull(id)
+      await BlogPost.save()
+      req.params.id=postId
+      await this.BlogById(req,res)
+    }
+    else {
+    
+      const user = await UserSchema.findOne({_id:id})
+      if (user) {
+      
+        await BlogPost.likes.push(user) 
+        await BlogPost.save()
+        req.params.id=postId
+        await this.BlogById(req,res)
+      }
+    }
+    
+  }
+  }
+  catch (err) {
+    // console.log(err)
+    return res.status(501).send({
+      status: false,
+      message: "An error occured: "+err,
+    });
+  }
+ 
 }

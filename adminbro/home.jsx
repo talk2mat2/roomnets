@@ -4,17 +4,28 @@ import { ApiClient } from "admin-bro";
 import { Box } from "@admin-bro/design-system";
 import styled from "styled-components";
 import axios from "axios";
+const Line = styled.div`
+  height: 1px;
+  width: 100%;
+  background-color: tomato;
+  margin: 5px 0 9px;
+`;
+const Select = styled.select`
+  margin: 10px;
+  color: grey;
 
+  border: none;
+`;
 const FaqDiv = styled.div`
   position: absolute;
   width: 60%;
-  top: 25vh;
+  top: 10vh;
   margin-left: auto;
   margin-right: auto;
   left: 0;
   right: 0;
   z-index: 19999;
-  height: 440px;
+  min-height: 440px;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 0 40px -10px #000;
@@ -40,8 +51,14 @@ const FaqDiv = styled.div`
     transition: all 0.3s;
     border-bottom: 2px solid #bebed2;
   }
+  .input2 {
+    border-bottom: 2px solid #fff;
+  }
   input:focus {
     border-bottom: 2px solid #78788c;
+  }
+  .inpu2:focus {
+    border-bottom: 2px solid #fff;
   }
   p:before {
     content: attr(type);
@@ -76,11 +93,20 @@ const Dashboard = () => {
   const [data, setData] = useState({});
   const [ImageState, setImageState] = React.useState([]);
   const [faqVisible, setfaqVisible] = React.useState(false);
+  const [ImageState2, setImageState2] = React.useState({});
   const [Privacy, setPrivacy] = React.useState(false);
+
+  const [blogpost, setBlogpost] = React.useState(false);
   const [Aboutus, setAboutus] = React.useState(false);
   const [loading, setloading] = React.useState(false);
   const [count, setCount] = useState({ no_Apart: 0, no_Rooms: 0, no_Users: 0 });
   const [banners, setBanners] = React.useState([]);
+  const [formResponse2, setFormResponse2] = React.useState({
+    title: "",
+    body: "",
+    country: "",
+    image: "",
+  });
   const [formResponse, setFormResponse] = React.useState({
     question: "",
     answer: "",
@@ -110,7 +136,7 @@ const Dashboard = () => {
       .catch((err) => alert("failure"));
   };
   const postPrivacy = async () => {
-    if (!formResponse.privacyBody | !formResponse.privacyTitle) {
+    if (!formResponse.privacyBody || !formResponse.privacyTitle) {
       return alert("Body or title can not be empty");
     }
     setPrivacy(false);
@@ -203,7 +229,7 @@ const Dashboard = () => {
         setImageState([]);
         setloading(false);
         setBanners(response.data.userData.Banners);
-        // alert(response.data.message);
+        alert("Operation was successfull");
       })
       .catch((err) => {
         console.log(err);
@@ -263,6 +289,64 @@ const Dashboard = () => {
   const handleAbout = () => {
     setAboutus(true);
   };
+  const handleBlog = () => {
+    setBlogpost(true);
+  };
+
+  function handleChange2(event) {
+    if (
+      event.target.files[0].type === "image/png" ||
+      event.target.files[0].type === "image/jpg" ||
+      event.target.files[0].type === "image/jpeg"
+    ) {
+      if (event.target.files[0]) {
+        // const newImagestate = ImageState;
+        // newImagestate.push({
+        //   file: URL.createObjectURL(event.target.files[0]),
+        //   Uri: event.target.files[0],
+        // });
+        // setImageState(newImagestate);
+        setImageState2({
+          file: URL.createObjectURL(event.target.files[0]),
+          Uri: event.target.files[0],
+        });
+      }
+    } else {
+      return alert("select a valid image format");
+    }
+  }
+
+  const CreateNewBlogPost = async () => {
+    if (!formResponse2.title || !formResponse2.body || !formResponse2.country) {
+      return alert("You didnt fill the Mandatory fields");
+    }
+    var formData = new FormData();
+    formData.append("userData", JSON.stringify(formResponse2));
+    // for (let x = 0; x < ImageState.length; x++) {
+    formData.append("file", ImageState2["Uri"]);
+
+    // dispatch(SETPOSTROOMPROCESS(formResponse));
+    setloading(true);
+    setBlogpost(false);
+    await axios({
+      // url: `${ProxyUrl}/users/PreRegister`,
+      url: `/Api/v1/createBlog`,
+      method: "POST",
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+      .then(function (response) {
+        setloading(false);
+          console.log(response.data);
+          alert(response.data.message)
+      })
+      .catch((err) => {
+        setloading(false);
+        alert("An error has occured");
+      });
+  };
   return (
     <Box variant="grey">
       {/* <Box variant="white">some: {data.some}</Box> */}
@@ -274,6 +358,7 @@ const Dashboard = () => {
         >
           Welcome to admin section
         </h2>
+        <Line />
       </Box>
       <br />
       {faqVisible ? (
@@ -423,6 +508,113 @@ const Dashboard = () => {
           <br />
           <br />
           <button onClick={postAboutUs}>
+            <span
+              className="sc-giAqnE dqTeSL admin-bro_Icon"
+              color="grey100"
+            ></span>
+            Publish
+          </button>
+        </FaqDiv>
+      ) : null}
+      {/* edit blog post */}
+
+      {blogpost ? (
+        <FaqDiv>
+          <div
+            onClick={() => setBlogpost(false)}
+            style={{
+              float: "right",
+              cursor: "pointer",
+              color: "tomato",
+            }}
+          >
+            <h1>x</h1>
+          </div>
+
+          <div>
+            <h2 style={{ fontWeight: "bold", textAlign: "center" }}>
+              Create New Blog Post
+            </h2>
+          </div>
+
+          <br />
+          <label>
+            Topic <sup>*</sup>
+          </label>
+          <input
+            type="text"
+            value={formResponse2.title}
+            onChange={(e) =>
+              setFormResponse2({
+                ...formResponse2,
+                title: e.target.value,
+              })
+            }
+          />
+
+          <br />
+          <br />
+          <br />
+          <label>
+            Body <sup>*</sup>
+          </label>
+          <br />
+
+          <textarea
+            value={formResponse2.body}
+            onChange={(e) =>
+              setFormResponse2({
+                ...formResponse2,
+                body: e.target.value,
+              })
+            }
+            rows={10}
+          ></textarea>
+          <br />
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <div>
+              <p>Select Image</p>
+              <input
+                className="input2"
+                type="file"
+                onChange={handleChange2}
+                accept="image/x-png,image/jpeg,image/gif"
+              />
+            </div>
+            <div>
+              <br />
+              <br />
+              <Select
+                onChange={(e) =>
+                  setFormResponse2({
+                    ...formResponse2,
+                    country: e.target.value,
+                  })
+                }
+                value={formResponse2.country}
+              >
+                <option value="NG">
+                  --Select Country <sup>*</sup>--
+                </option>
+                <option value="NG">Nigeria</option>
+                <option value="GH">Ghana</option>
+                <option value="KE">Kenya</option>
+                <option value="US">USA</option>
+                <option value="ZA">South-Africa</option>
+                <option value="IE">Ireland</option>
+                <option value="GB">UK</option>
+              </Select>
+            </div>
+          </div>
+          <br />
+          <button onClick={CreateNewBlogPost}>
             <span
               className="sc-giAqnE dqTeSL admin-bro_Icon"
               color="grey100"
@@ -863,7 +1055,7 @@ const Dashboard = () => {
         </section>
       </div>
       <form onSubmit={UploadNow}>
-        <div
+        {/* <div
           style={{
             display: "flex",
             flexDirection: "row",
@@ -872,11 +1064,19 @@ const Dashboard = () => {
           }}
         >
           {mapBanners ? mapBanners() : null}
-        </div>
+        </div> */}
 
         <br />
         <Box variant="white">
           {loading ? <p>..Uploading</p> : null}
+          <h5
+            font-size="sm"
+            className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
+            font-weight="normal"
+          >
+            Add Banners
+          </h5>
+          <Line />
           <div
             style={{
               display: "flex",
@@ -887,13 +1087,7 @@ const Dashboard = () => {
             {mapImagestate()}
           </div>
           <br />
-          <h5
-            font-size="sm"
-            className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
-            font-weight="normal"
-          >
-            Add Banners
-          </h5>
+
           <small className="sc-dIvqjp  sc-fKgIG">
             <i>Select up to 2 images and click on upload</i>
             <br />
@@ -942,6 +1136,7 @@ const Dashboard = () => {
         >
           Web Content
         </h5>
+        <Line />
         <Box>
           <ul>
             <h6>
@@ -959,7 +1154,43 @@ const Dashboard = () => {
           </ul>
         </Box>
       </Box>
+
       <br />
+      <Box variant="white">
+        <h5
+          font-size="sm"
+          className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
+          font-weight="normal"
+        >
+          Blog Posts
+        </h5>
+        <Line />
+        <Box>
+          <button
+            type="submit"
+            onClick={handleBlog}
+            data-testid="action-new"
+            className="sc-gtssRu sc-dvXXZy kGJZae eAtiBe admin-bro_ButtonGroupItem admin-bro_Button admin-bro_ButtonGroupItem"
+          >
+            <span className="sc-giAqnE dqTeSL admin-bro_Icon" color="grey100">
+              <svg
+                focusable="false"
+                preserveAspectRatio="xMidYMid meet"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                width="16"
+                height="16"
+                viewBox="0 0 32 32"
+                aria-hidden="true"
+              >
+                <path d="M17 15L17 8 15 8 15 15 8 15 8 17 15 17 15 24 17 24 17 17 24 17 24 15z"></path>
+              </svg>
+            </span>
+            Create New Post
+          </button>
+        </Box>
+      </Box>
+
       <br />
       <br />
       <br />

@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose
+const  {sendmail} =require( "../middlewares/mailer")
 
 
 
 const Rooms = new Schema({
     no_rooms: String,
-    amenities_private_toilets: Boolean,
+    Approved_By_Admin:{type:Boolean,default:false,enum:[true,false]},
+  
     no_toilets:String,
     media: [{ uri: String }],
     isPaidAdd: {type:Boolean,default:false},
@@ -36,12 +38,14 @@ const Rooms = new Schema({
     amenities_entry_disabled: Boolean,
     amenities_balcony: Boolean,
     amenities_others: Boolean,
+    amenities_private_toilets: Boolean,
     existing_room_mates: Object,
     new_room_mate: Object,
     advert_title: String,
     advert_description: String,
     post_code: String,
-    currency:String,
+    currency: String,
+   
     posted_by:{
         type: Schema.Types.ObjectId,
         ref: 'Users'
@@ -54,7 +58,54 @@ Rooms.index({ location: "2dsphere" });
 
 Rooms.pre("save", next => {
     this.updated_at = Date.now()
+  
     next()
   })
+
+
+//   Rooms.path('no_rooms').set(function (newVal) {
+//       var originalVal = this.no_rooms;
+//       console.log(originalVal)
+//     if (newVal!==originalVal) {
+//       this._customState = true;
+//       }
+//       return newVal
+      
+//   });
+
+
+// Rooms.post('findOneAndUpdate', function (doc) {
+//     //check modified fields or if the name field was modified and then update doc
+//     var modified_paths = this.getUpdate().$set.no_rooms
+    
+//     console.log(modified_paths);
+ 
+// })
+// Rooms.pre('findOneAndUpdate', function (next) {
+
+//     if (this._customState) {
+//         console.log("value changed")
+//     }
+
+//     next()
+// });
+
+Rooms.pre('findOneAndUpdate', async function() {
+    const docToUpdate = await this.model.findOne(this.getQuery());
+    //console.log(docToUpdate.Approved_By_Admin); // The document that `findOneAndUpdate()` will modify
+    const modifiedFields = this.getUpdate()['$set']['Approved_By_Admin'];
+    // console.log(modifiedFields)
+    if (docToUpdate.Approved_By_Admin === false && modifiedFields === true) {
+        console.log("YOUR ADD HAS BEEN APPROVED BY ADMIN AND ITS VISSIBLE NOW" + docToUpdate.email)
+        try {
+            await sendmail(docToUpdate)
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+  });
+  
+
 
 module.exports = mongoose.model("rooms",Rooms)
