@@ -760,7 +760,7 @@ exports.ListRoomsByLnglat = async (req, res) => {
               type: "Point",
               coordinates: [lng, lat],
             },
-            maxDistance: 1200000, //meters if search result disatcne
+            maxDistance: 120000, //meters if search result disatcne
             key: "location",
             distanceField: "distance",
           },
@@ -768,7 +768,8 @@ exports.ListRoomsByLnglat = async (req, res) => {
         { $limit: limit },
         { $unset: "Password" },
         { $skip: skip },
-        {$match:{"Approved_By_Admin":true}},
+      { $match: { "Approved_By_Admin": true } },
+      { $sort : { distance : 1 } }
         // {$count:"total"},
       ]
     : [];
@@ -780,7 +781,7 @@ exports.ListRoomsByLnglat = async (req, res) => {
               type: "Point",
               coordinates: [lng, lat],
             },
-            maxDistance: 1200000, //meters if search result disatcne
+            maxDistance: 120000, //meters if search result disatcne
             key: "location",
             distanceField: "distance",
           },
@@ -843,7 +844,7 @@ exports.ListApartByLnglat = async (req, res) => {
               type: "Point",
               coordinates: [lng, lat],
             },
-            maxDistance: 1200000, //meters if search result disatcne
+            maxDistance: 120000, //meters if search result disatcne
             key: "location",
             distanceField: "distance",
           },
@@ -851,7 +852,8 @@ exports.ListApartByLnglat = async (req, res) => {
         { $limit: 7 },
         { $unset: "Password" },
         { $skip: skip },
-        {$match:{"Approved_By_Admin":true}},
+      { $match: { "Approved_By_Admin": true } },
+      { $sort : { distance : 1 } }
         // {$count:"total"},
       ]
     : [];
@@ -863,7 +865,7 @@ exports.ListApartByLnglat = async (req, res) => {
               type: "Point",
               coordinates: [lng, lat],
             },
-            maxDistance: 1200000, //meters if search result disatcne
+            maxDistance: 120000, //meters if search result disatcne
             key: "location",
             distanceField: "distance",
           },
