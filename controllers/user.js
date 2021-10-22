@@ -80,6 +80,7 @@ exports.Register = async (req, res) => {
     password2,
     // Gender,
     mobileNumber,
+    country
   } = req.body;
   // console.log(req.body);
   const Email = email;
@@ -94,7 +95,7 @@ exports.Register = async (req, res) => {
     return res.status(501).json({ message: "both password dont match" });
   }
   // console.log(firstName, lastName, email, Password, Password2);
-  if (!Password2 || !Password || !lastName || !firstName || !Email) {
+  if (!Password2 || !Password || !lastName || !firstName || !Email || !country) {
     return res.status(501).json({
       message: "You didnt fill all values required,kindly try again",
     });
@@ -116,6 +117,7 @@ exports.Register = async (req, res) => {
           Email,
           Password: Passwordhash,
           RegisterdDate,
+          country
         });
         await newUser.save();
 
@@ -534,13 +536,14 @@ exports.ListRoomsByState = async (req, res) => {
   const params = req.params.state
     ? {"Approved_By_Admin":true,
         "building_location.address": {
+          // $regex: req.params.state,
           $regex: req.params.state,
           $options: "i",
         },
       }
     : {};
 
-  let total = await Rooms.countDocuments({});
+  let total = await Rooms.countDocuments(params);
   const limit = 15;
 
   var pageNo = req.query.pageNo || 0;
@@ -568,7 +571,7 @@ exports.ListRoomsByState = async (req, res) => {
 };
 //liat  Apartments
 exports.ListApartByState = async (req, res) => {
-  let total = await Apartments.countDocuments({});
+
 
   const limit = 15;
   // const params = {}
@@ -580,6 +583,7 @@ exports.ListApartByState = async (req, res) => {
         },
       }
     : {};
+  let total = await Apartments.countDocuments(params);
   var pageNo = req.query.pageNo || 0;
 
   var skip = pageNo * limit;
@@ -679,7 +683,7 @@ exports.ListRoomsByLocation = async (req, res) => {
   var skip = pageNo * limit;
 
   await Rooms.find(params)
-    .populate("posted_by", "-Password")
+    .populate("posted_by", "-Password").limit(limit).skip(skip)
     .then((response) => {
       return res.status(200).send({
         status: true,
@@ -717,7 +721,7 @@ exports.ListApartByLocation = async (req, res) => {
   var skip = pageNo * limit;
 
   await Apartments.find(params)
-    .populate("posted_by", "-Password")
+    .populate("posted_by", "-Password").limit(limit).skip(skip)
     .then((response) => {
       return res.status(200).send({
         status: true,

@@ -16,6 +16,7 @@ const UserSchema = new Schema({
   isAdmin: { Type: Boolean, default: false },
   created_at: { type: Date, default: Date.now() },
   updated_at: { type: Date, default: Date.now() },
+  country:{type:String,enum:['Nigeria','Kenya','Ireland','Usa','Uk','South Africa','Ghana']}
 });
 
 UserSchema.methods.verifyPassword = async function (Password) {

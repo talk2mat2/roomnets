@@ -3994,6 +3994,12 @@ background-color: rgba(44, 38, 30, 0.342);
 // Extra small devices (portrait phones, less than 576px)
 ============================================================*/
 @media (max-width: 575.98px){
+  .slider-title {
+    margin-bottom: 2px !important;
+  }
+  .slider-title-sub{
+    font-size: 16px !important;
+  }
   .browse-cards{
     width:90% !important;
   }
@@ -4127,4 +4133,36 @@ background-color: rgba(44, 38, 30, 0.342);
 
 html{
   scroll-behavior: smooth;
+}
+
+.overLaySlider {
+  text-align: center;
+  width: 100%;
+  position: absolute;
+  padding-top: 8%;
+  z-index: 99;
+  height: 100%;
+  /* background-color: rgba(241, 177, 177, 0.466); */
+  background-color: rgba(44, 38, 30, 0.342);
+}
+.home-slider {
+  height: 300px;
+  width: 100%;
+}
+.weathimg {
+  height: 100%;
+  right: 0;
+  width: 100%;
+  object-fit: cover;
+}
+.slider-title {
+  color: #fff;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+.slider-title-sub{
+  color: #fff;
+  font-weight: 800;
+ font-size: 20px;
+ letter-spacing: 1.5px;
 }
