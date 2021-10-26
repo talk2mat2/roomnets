@@ -4,8 +4,10 @@ const UserSchema = require("../models/userMoodel");
 const ContactMessages = require("../models/contactMessages");
 const Rooms = require("../models/rooms");
 const Blog = require("../models/blog");
+const AdRates = require("../models/AdRates");
 const Apartments = require("../models/apartments");
 const BlogComments = require("../models/BlogComments");
+var querystring = require('querystring');
 
 const HomepageModels = require("../models/homepageModel");
 
@@ -30,6 +32,21 @@ function validateEmail(email) {
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 }
+
+function getYear(){
+  const d = new Date()
+var amountOfYearsRequired = 1;
+const time=d.setFullYear(d.getFullYear() + amountOfYearsRequired);
+const year= new Date(time)
+return year
+}
+function getDays(days){
+  var d = new Date();
+  const time=d.setDate(d.getDate() + days);
+  const times= new Date(time)
+  return times
+}
+
 
 exports.Login = async function (req, res) {
   const { Email, Password } = req.body;
@@ -494,7 +511,7 @@ exports.PostAddRooms = async (req, res) => {
       return res.status(201).send({
         status: true,
         message: "Addd Post was successful",
-        usadData: DataInfo,
+        usadData: success,
       });
     }
   });
@@ -572,41 +589,74 @@ exports.ListRoomsByState = async (req, res) => {
 //liat  Apartments
 exports.ListApartByState = async (req, res) => {
 
-
-  const limit = 15;
-  // const params = {}
   const params = req.params.state
-    ? {"Approved_By_Admin":true,
-        "building_location.address": {
-          $regex: req.params.state,
-          $options: "i",
-        },
-      }
-    : {};
-  let total = await Apartments.countDocuments(params);
-  var pageNo = req.query.pageNo || 0;
+  ? {"Approved_By_Admin":true,
+      "building_location.address": {
+        $regex: req.params.state,
+        $options: "i",
+      },
+    }
+  : {};
+// console.log(req.query.location)
+let total = await Apartments.countDocuments(params);
+const limit = 15;
 
-  var skip = pageNo * limit;
+var pageNo = req.query.pageNo || 0;
 
-  await Apartments.find(params)
-    .populate("posted_by", "-Password")
-    .limit(limit)
-    .then((response) => {
-      return res.status(200).send({
-        status: true,
-        message: "Search Result Success",
-        userData: response,
-        total: total,
-        limit: limit,
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(404).send({
-        status: false,
-        message: "emty result",
-      });
+var skip = pageNo * limit;
+
+await Apartments.find(params)
+  .populate("posted_by", "-Password").limit(limit).skip(skip).sort({isPaidAdd:-1})
+  .then((response) => {
+    return res.status(200).send({
+      status: true,
+      message: "Search Result Success",
+      userData: response,
+      total: total,
+      limit: limit,
     });
+  })
+  .catch((err) => {
+    console.log(err);
+    return res.status(404).send({
+      status: false,
+      message: "emty result",
+    });
+  });
+  // const limit = 15;
+  // // const params = {}
+  // const params = req.params.state
+  //   ? {"Approved_By_Admin":true,
+  //       "building_location.address": {
+  //         $regex: req.params.state,
+  //         $options: "i",
+  //       },
+  //     }
+  //   : {};
+  // let total = await Apartments.countDocuments(params);
+  // var pageNo = req.query.pageNo || 0;
+
+  // var skip = pageNo * limit;
+
+  // await Apartments.find(params)
+  //   .populate("posted_by", "-Password")
+  //   .limit(limit)
+  //   .then((response) => {
+  //     return res.status(200).send({
+  //       status: true,
+  //       message: "Search Result Success",
+  //       userData: response,
+  //       total: total,
+  //       limit: limit,
+  //     });
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //     return res.status(404).send({
+  //       status: false,
+  //       message: "emty result",
+  //     });
+  //   });
 };
 
 exports.PostAddApart = async (req, res) => {
@@ -659,7 +709,7 @@ exports.PostAddApart = async (req, res) => {
       return res.status(201).send({
         status: true,
         message: "Add Post was successful",
-        usadData: DataInfo,
+        usadData: success,
       });
     }
   });
@@ -683,7 +733,7 @@ exports.ListRoomsByLocation = async (req, res) => {
   var skip = pageNo * limit;
 
   await Rooms.find(params)
-    .populate("posted_by", "-Password").limit(limit).skip(skip)
+    .populate("posted_by", "-Password").limit(limit).skip(skip).sort({isPaidAdd:-1})
     .then((response) => {
       return res.status(200).send({
         status: true,
@@ -704,6 +754,7 @@ exports.ListRoomsByLocation = async (req, res) => {
 
 //list apartments when a user search by address string
 exports.ListApartByLocation = async (req, res) => {
+
   const params = req.query.location
     ? {"Approved_By_Admin":true,
         "building_location.address": {
@@ -721,7 +772,7 @@ exports.ListApartByLocation = async (req, res) => {
   var skip = pageNo * limit;
 
   await Apartments.find(params)
-    .populate("posted_by", "-Password").limit(limit).skip(skip)
+    .populate("posted_by", "-Password").limit(limit).skip(skip).sort({isPaidAdd:-1})
     .then((response) => {
       return res.status(200).send({
         status: true,
@@ -769,11 +820,12 @@ exports.ListRoomsByLnglat = async (req, res) => {
             distanceField: "distance",
           },
         },
+        { $sort : {isPaidAdd:-1,distance : 1 } },
         { $limit: limit },
         { $unset: "Password" },
         { $skip: skip },
       { $match: { "Approved_By_Admin": true } },
-      { $sort : { distance : 1 } }
+      // { $sort : { distance : 1 ,isPaidAdd:1} }
         // {$count:"total"},
       ]
     : [];
@@ -853,11 +905,12 @@ exports.ListApartByLnglat = async (req, res) => {
             distanceField: "distance",
           },
         },
+        { $sort : {isPaidAdd:-1,distance : 1 } },
         { $limit: 7 },
         { $unset: "Password" },
         { $skip: skip },
       { $match: { "Approved_By_Admin": true } },
-      { $sort : { distance : 1 } }
+     
         // {$count:"total"},
       ]
     : [];
@@ -887,6 +940,7 @@ exports.ListApartByLnglat = async (req, res) => {
 
   await Apartments.aggregate(params)
     .then(async (response) => {
+      // console.log(response)
       const populated = await UserSchema.populate(response, {
         path: "posted_by",
         select: "-Password",
@@ -1283,4 +1337,297 @@ exports.LikeAPost = async (req, res) => {
     });
   }
  
+}
+exports.handleUpgradeRooms=async(req,res)=>{
+const{post_id,payment_response,plan}= req.body
+
+
+if(!post_id || !payment_response || ! plan){
+
+  return res.status(501).send({
+    status: false,
+    message: "An error occured: "
+  });
+}
+
+const isPaid = await axios.get(
+  `https://api.flutterwave.com/v3/transactions/${payment_response.transaction_id}/verify`,
+  {
+    headers: { Authorization: `Bearer ${process.env.FLUTTER_SECRET_KEY}` },
+  }
+);
+if (!isPaid.data.status === "success") {
+  return res
+    .status(404)
+    .json({ message: "payment wasnt successfull, try again",status:false });
+}
+if (isPaid.data.status === "success") {
+ 
+const today=new Date()
+
+const expire_date=plan==="month"?getDays(30):plan==="week"? getDays(7):plan==="year"?getYear():""
+  await Rooms.findByIdAndUpdate(
+    { _id: post_id },
+    {
+      // $inc: params,
+      isPaidAdd:true,
+      expire_date:expire_date,
+      purchase_date:today,
+      plan:plan,
+      payment_response:payment_response
+    },
+    { new: true, useFindAndModify: false }
+  )
+    .then((data) => {
+      return res.json({
+        userData: data,
+        status:true,
+        message:"success"
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(501).send({ message: "an error occured,unable update post to premiumt",status:false, });
+    });
+}
+}
+exports.handleUpgradeApart=async(req,res)=>{
+  const{post_id,payment_response,plan}= req.body
+  if(!post_id || !payment_response || ! plan){
+  
+    return res.status(501).send({
+      status: false,
+      message: "An error occured: "
+    });
+  }
+  
+  const isPaid = await axios.get(
+    `https://api.flutterwave.com/v3/transactions/${payment_response.transaction_id}/verify`,
+    {
+      headers: { Authorization: `Bearer ${process.env.FLUTTER_SECRET_KEY}` },
+    }
+  );
+  if (!isPaid.data.status === "success") {
+    return res
+      .status(404)
+      .json({ message: "payment wasnt successfull, try again",status:false });
+  }
+  if (isPaid.data.status === "success") {
+   
+  const today=new Date()
+  
+  const expire_date=plan==="month"?getDays(30):plan==="week"? getDays(7):plan==="year"?getYear():""
+    await Apartments.findByIdAndUpdate(
+      { _id: post_id },
+      {
+        // $inc: params,
+        isPaidAdd:true,
+        expire_date:expire_date,
+        purchase_date:today,
+        plan:plan,
+        payment_response:payment_response
+      },
+      { new: true, useFindAndModify: false }
+    )
+      .then((data) => {
+        return res.json({
+          userData: data,
+          status:true,
+          message:"success"
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(501).send({ message: "an error occured,unable update post to premiumt",status:false, });
+      });
+  }
+}
+exports.getPricesRates=async(req,res)=>{
+const country=req.params.country
+if(!country){
+    return res.status(501).send({
+      status: false,
+      message: "No country provided: "
+    });
+}
+
+  await AdRates.findOne({country}).then(rates=>{
+    // if the country ad rates is not set we return default which is the else statement
+    if(rates){return res.status(200).json({
+      userData: rates,
+      status:true,
+      message:"success"
+    })}
+    else{
+      return res.status(200).json({
+        userData: {"currency":"USD" , WeeklyPrice:70,MonthlyPrice:200, YearlyPrice:350,country:"Default"},
+        status:true,
+        message:"success"
+      });
+    }
+  }).catch(err=>{
+    console.log(err)
+//we return a default if not set by admin, any any circumstancees
+//is used status 200 to return success to client an in means
+    return res.status(200).json({
+      userData: {"currency":"USD" , WeeklyPrice:70,MonthlyPrice:200, YearlyPrice:350,country:"Default"},
+      status:true,
+      message:"success"
+    });
+  })
+}
+
+
+
+exports.handleUpgradesRoomPayPal=async (req,res)=>{
+  const{post_id,plan,orderID}= req.body
+  // PAYPAL_OAUTH_API = 'https://api-m.sandbox.paypal.com/v1/oauth2/token/';
+  // PAYPAL_ORDER_API = 'https://api-m.sandbox.paypal.com/v2/checkout/orders/';
+  const PAYPAL_OAUTH_API = process.env.PAYPAL_OAUTH_API
+  const PAYPAL_ORDER_API = process.env.PAYPAL_ORDER_API
+
+  basicAuth = Buffer.from(`${ process.env.PAYPAL_CLIENT }:${ process.env.PAYPAL_SECRET }`).toString('base64')
+  // const auth = await axios.post(PAYPAL_OAUTH_API ,{"grant_type": "client_credentials"},{
+  //   headers: {
+  //     // Accept:        `application/json`,
+  //     'Content-Type':'application/x-www-form-urlencoded',
+  //     Authorization: `Basic ${ basicAuth }`
+  //   },
+  //   // data: `grant_type=client_credentials`
+  // }).
+  
+  
+  const auth = await axios.post(PAYPAL_OAUTH_API,
+    // note the use of querystring
+    querystring.stringify({'grant_type':'client_credentials'}),{
+    headers: {
+      'Content-Type':'application/x-www-form-urlencoded',     
+      Authorization: `Basic ${ basicAuth }`
+    }
+  }).then(res=>res.data).catch(err=>{
+    console.log(err)
+  })
+
+
+  // const orderID = req.body.orderID;
+  const details = await axios.get(PAYPAL_ORDER_API + orderID, {
+    headers: {
+      Accept:        `application/json`,
+      Authorization: `Bearer ${ auth.access_token }`
+    }
+  }).then(res=>res.data).catch((err)=>{
+    console.log(err)
+    return err
+  });
+// console.log(details)
+  // if (details.purchase_units[0].amount.value !== '5.77') {
+  if (!details.purchase_units[0].amount.value) {
+    console.log(details)
+    return res.send(400);
+  }
+  else{
+    const today=new Date()
+    const expire_date=plan==="month"?getDays(30):plan==="week"? getDays(7):plan==="year"?getYear():""
+      await Rooms.findByIdAndUpdate(
+        { _id: post_id },
+        {
+          // $inc: params,
+          isPaidAdd:true,
+          expire_date:expire_date,
+          purchase_date:today,
+          plan:plan,
+          payment_response:details
+        },
+        { new: true, useFindAndModify: false }
+      )
+        .then((data) => {
+          return res.json({
+            userData: data,
+            status:true,
+            message:"success"
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(501).send({ message: "an error occured,unable update post to premiumt",status:false, });
+        });
+  }
+
+}
+
+
+exports.handleUpgradesApartPayPal=async (req,res)=>{
+  const{post_id,plan,orderID}= req.body
+  // console.log(req.body)
+  // PAYPAL_OAUTH_API = 'https://api-m.sandbox.paypal.com/v1/oauth2/token/';
+  // PAYPAL_ORDER_API = 'https://api-m.sandbox.paypal.com/v2/checkout/orders/';
+  const PAYPAL_OAUTH_API = process.env.PAYPAL_OAUTH_API
+  const PAYPAL_ORDER_API = process.env.PAYPAL_ORDER_API
+  basicAuth = Buffer.from(`${ process.env.PAYPAL_CLIENT }:${ process.env.PAYPAL_SECRET }`).toString('base64')
+  // const auth = await axios.post(PAYPAL_OAUTH_API ,{"grant_type": "client_credentials"},{
+  //   headers: {
+  //     // Accept:        `application/json`,
+  //     'Content-Type':'application/x-www-form-urlencoded',
+  //     Authorization: `Basic ${ basicAuth }`
+  //   },
+  //   // data: `grant_type=client_credentials`
+  // }).
+  
+  
+  const auth = await axios.post(PAYPAL_OAUTH_API,
+    // note the use of querystring
+    querystring.stringify({'grant_type':'client_credentials'}),{
+    headers: {
+      'Content-Type':'application/x-www-form-urlencoded',     
+      Authorization: `Basic ${ basicAuth }`
+    }
+  }).then(res=>res.data).catch(err=>{
+    console.log(err)
+  })
+
+
+  // const orderID = req.body.orderID;
+  const details = await axios.get(PAYPAL_ORDER_API + orderID, {
+    headers: {
+      Accept:        `application/json`,
+      Authorization: `Bearer ${ auth.access_token }`
+    }
+  }).then(res=>res.data).catch((err)=>{
+    console.log(err)
+    return err
+  });
+// console.log(details)
+  // if (details.purchase_units[0].amount.value !== '5.77') {
+  if (!details.purchase_units[0].amount.value) {
+    console.log(details)
+    return res.send(400);
+  }
+  else{
+    const today=new Date()
+    const expire_date=plan==="month"?getDays(30):plan==="week"? getDays(7):plan==="year"?getYear():""
+      await Apartments.findByIdAndUpdate(
+        { _id: post_id },
+        {
+          // $inc: params,
+          isPaidAdd:true,
+          expire_date:expire_date,
+          purchase_date:today,
+          plan:plan,
+          payment_response:details
+        },
+        { new: true, useFindAndModify: false }
+      )
+        .then((data) => {
+          return res.json({
+            userData: data,
+            status:true,
+            message:"success"
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(501).send({ message: "an error occured,unable update post to premiumt",status:false, });
+        });
+  }
+
 }

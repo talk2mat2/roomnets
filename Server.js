@@ -12,6 +12,7 @@ const Apartments = require("./models/apartments");
 const ContactMessage = require("./models/contactMessages");
 const Blogs = require("./models/blog");
 const Blogscomments = require("./models/BlogComments");
+const AdRates = require("./models/AdRates");
 const homepageModels = require("./models/homepageModel");
 const AdminBro = require("admin-bro");
 const AdminBroMongoose = require("@admin-bro/mongoose");
@@ -67,6 +68,19 @@ const adminBro = new AdminBro({
       options: {
         properties: {
           body: {
+            isVisible: { list: false, filter: false, show: true, edit: false },
+          },
+        },
+      },
+    },
+    {
+      resource: AdRates,
+      options: {
+        properties: {
+          created_at: {
+            isVisible: { list: false, filter: false, show: true, edit: false },
+          },
+          updated_at: {
             isVisible: { list: false, filter: false, show: true, edit: false },
           },
         },

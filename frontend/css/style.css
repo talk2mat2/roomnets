@@ -4166,3 +4166,28 @@ html{
  font-size: 20px;
  letter-spacing: 1.5px;
 }
+.upgrade-card{
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  margin:6px;
+  cursor:pointer;
+}
+
+.upgrade-card.selected{
+  border:3px solid #87CEEB;
+  
+
+}
+.paycard{
+  width:100px;
+}
+.pay-card{
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  margin:10px;
+  width:200px;
+  /* padding:5px; */
+
+  cursor:pointer;
+}
+.paypal-btn{
+  /* background-color:#ffc439; */
+}

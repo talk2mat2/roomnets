@@ -45,6 +45,10 @@ const Apartments = new Schema({
     currency:String,
     advert_description: String,
     post_code: String,
+    expire_date:Date,
+    purchase_date:Date,
+    plan:String,
+    payment_response:Object,
     posted_by:{
         type: Schema.Types.ObjectId,
         ref: 'Users'
@@ -65,7 +69,7 @@ Apartments.pre("save", next => {
 Apartments.pre('findOneAndUpdate', async function() {
     const docToUpdate = await this.model.findOne(this.getQuery());
     //console.log(docToUpdate.Approved_By_Admin); // The document that `findOneAndUpdate()` will modify
-    const modifiedFields = this.getUpdate()['$set']['Approved_By_Admin'];
+    const modifiedFields = this.getUpdate()['$set']?this.getUpdate()['$set']['Approved_By_Admin']:"";
     // console.log(modifiedFields)
     if (docToUpdate.Approved_By_Admin === false && modifiedFields === true) {
         console.log("YOUR ADD HAS BEEN APPROVED BY ADMIN AND ITS VISSIBLE NOW" + docToUpdate.email)

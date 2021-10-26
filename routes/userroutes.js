@@ -47,7 +47,12 @@ const {
   updateAboutUs,
   CreateBlog,
   BlogPostAllRecent,
-  BlogPostAll
+  BlogPostAll,
+  handleUpgradeRooms,
+  handleUpgradeApart,
+  getPricesRates,
+  handleUpgradesRoomPayPal,
+  handleUpgradesApartPayPal
 } = require("../controllers/user");
 
 var storage = multer.diskStorage({
@@ -103,6 +108,7 @@ Router.get("/ListRoomsByLocation", ListRoomsByLocation);
 Router.get("/ListApartByLocation", ListApartByLocation);
 Router.get("/ListRoomsByLnglat", ListRoomsByLnglat);
 Router.get("/BlogPostAllRecent/:country", BlogPostAllRecent);
+Router.get("/getPricesRates/:country", getPricesRates);
 Router.get("/LikeAPost/:postId",LoginbyJWT, LikeAPost);
 Router.get("/ListApartByLnglat", ListApartByLnglat);
 Router.get("/countDocuments", countDocuments);
@@ -113,6 +119,10 @@ Router.post("/contactForm",contactForm);
 Router.post("/updateFaq",updateFaq);
 Router.post("/updateAboutUs", updateAboutUs);
 Router.post("/postComment",postComment);
+Router.post("/handleUpgradeRooms",handleUpgradeRooms);
+Router.post("/handleUpgradeApart",handleUpgradeApart);
+Router.post("/handleUpgradesRoomPayPal",handleUpgradesRoomPayPal);
+Router.post("/handleUpgradesApartPayPal",handleUpgradesApartPayPal);
 
 
 module.exports = Router;

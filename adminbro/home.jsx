@@ -601,7 +601,7 @@ const Dashboard = () => {
                 value={formResponse2.country}
               >
                 <option value="NG">
-                  --Select Country <sup>*</sup>--
+                  --Select Country*--
                 </option>
                 <option value="NG">Nigeria</option>
                 <option value="GH">Ghana</option>
