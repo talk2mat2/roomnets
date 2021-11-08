@@ -4188,6 +4188,11 @@ html{
 
   cursor:pointer;
 }
-.paypal-btn{
-  /* background-color:#ffc439; */
+.upgrade-section{
+  background: rgb(250, 248, 248);
+  min-height: 200px;
+  border: 2px solid rgb(218, 215, 215);
+}
+.upgrade-btn{
+  height: 50px;
 }

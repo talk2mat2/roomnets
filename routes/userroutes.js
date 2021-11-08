@@ -52,7 +52,9 @@ const {
   handleUpgradeApart,
   getPricesRates,
   handleUpgradesRoomPayPal,
-  handleUpgradesApartPayPal
+  handleUpgradesApartPayPal,
+  handleUpgradeAccount,
+  handleUpgradesAccountPayPal
 } = require("../controllers/user");
 
 var storage = multer.diskStorage({
@@ -123,6 +125,8 @@ Router.post("/handleUpgradeRooms",handleUpgradeRooms);
 Router.post("/handleUpgradeApart",handleUpgradeApart);
 Router.post("/handleUpgradesRoomPayPal",handleUpgradesRoomPayPal);
 Router.post("/handleUpgradesApartPayPal",handleUpgradesApartPayPal);
+Router.post("/handleUpgradeAccount",handleUpgradeAccount);
+Router.post("/handleUpgradesAccountPayPal",handleUpgradesAccountPayPal);
 
 
 module.exports = Router;

@@ -16,7 +16,11 @@ const UserSchema = new Schema({
   isAdmin: { Type: Boolean, default: false },
   created_at: { type: Date, default: Date.now() },
   updated_at: { type: Date, default: Date.now() },
-  country:{type:String,enum:['Nigeria','Kenya','Ireland','Usa','Uk','South Africa','Ghana']}
+  country:{type:String,enum:['Nigeria','Kenya','Ireland','Usa','Uk','South Africa','Ghana']},
+  plans: { type: String, default: "Basic" ,enum:['Basic','Premium']},
+
+  purchase_date:Date,
+  expire_date:Date,
 });
 
 UserSchema.methods.verifyPassword = async function (Password) {
@@ -33,4 +37,5 @@ UserSchema.pre("save", next => {
   this.updated_at = Date.now()
   next()
 })
+
 module.exports = mongoose.model("Users", UserSchema);
