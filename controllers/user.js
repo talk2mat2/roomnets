@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const UserSchema = require("../models/userMoodel");
+const MessagesSchema = require("../models/messagesModel");
 const ContactMessages = require("../models/contactMessages");
 const Rooms = require("../models/rooms");
 const Blog = require("../models/blog");
@@ -586,6 +587,40 @@ exports.ListRoomsByState = async (req, res) => {
       });
     });
 };
+
+
+
+//list room by me
+
+exports.ListRoomsByMe = async (req, res) => {
+  const params = {posted_by:req.body.id}
+
+  let total = await Rooms.countDocuments(params);
+  const limit = 15;
+
+  var pageNo = req.query.pageNo || 0;
+
+  var skip = pageNo * limit;
+
+  await Rooms.find(params)
+    .populate("posted_by", "-Password")
+    .then((response) => {
+      return res.status(200).send({
+        status: true,
+        message: "Search Result Success",
+        userData: response,
+        total: total,
+        limit: limit,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(404).send({
+        status: false,
+        message: "emty result",
+      });
+    });
+};
 //liat  Apartments
 exports.ListApartByState = async (req, res) => {
 
@@ -659,6 +694,38 @@ await Apartments.find(params)
   //   });
 };
 
+//list apartment by me
+exports.ListApartByMe = async (req, res) => {
+// console.log("called")
+  const params = {posted_by:req.body.id}
+console.log(params)
+let total = await Apartments.countDocuments(params);
+const limit = 15;
+
+var pageNo = req.query.pageNo || 0;
+
+var skip = pageNo * limit;
+
+await Apartments.find(params)
+  .populate("posted_by", "-Password").limit(limit).skip(skip).sort({isPaidAdd:-1})
+  .then((response) => {
+    return res.status(200).send({
+      status: true,
+      message: "Search Result Success",
+      userData: response,
+      total: total,
+      limit: limit,
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+    return res.status(404).send({
+      status: false,
+      message: "emty result",
+    });
+  });
+
+};
 exports.PostAddApart = async (req, res) => {
   console.log("file is", req.files.length);
   // const file = req.files;
@@ -1759,3 +1826,56 @@ exports.handleUpgradeAccount=async(req,res)=>{
       });
   }
 }
+
+
+
+
+exports.sendMessages = async (req, res) => {
+  const { body, receiver } = req.body;
+  const sender = req.body.id;
+  let { title } = req.body;
+  if (!receiver || !sender) {
+    return res
+      .status(501)
+      .json({ status:false,message: "receiver  or Sender cant not be blank" });
+  }
+  if (!title) {
+    title = "untitled";
+  }
+  if (!body) {
+    return res.status(501).json({status:false, message: "message body can not be blank" });
+  } else {
+    const newMessages = new MessagesSchema({ title, body, receiver, sender });
+    await newMessages.save((err, success) => {
+      if (err) {
+        console.log("unable to save", err);
+        return res.status(501).json({ message: "unable to save" });
+      } else {
+        return res.status(200).json({
+          message: "sent",
+        });
+      }
+    });
+  }
+};
+exports.FetchSentMessages = async (req, res) => {
+  const id = req.body.id;
+  MessagesSchema.find({ sender: id })
+    .populate("receiver", "-Password").then((items) => {
+      res.status(200).json({ userData: items });
+    })
+    .catch((err) => {
+      return res.status(404).json({ message: "empty" });
+    });
+};
+exports.FetchReceivedMessages = async (req, res) => {
+  const id = req.body.id;
+  MessagesSchema.find({ receiver: id })
+    .populate("sender", "-Password")
+    .then((items) => {
+      res.status(200).json({ userData: items ,status:true});
+    })
+    .catch((err) => {
+      return res.status(404).json({ message: "empty",status:false });
+    });
+};

@@ -4174,8 +4174,6 @@ html{
 
 .upgrade-card.selected{
   border:3px solid #87CEEB;
-  
-
 }
 .paycard{
   width:100px;
@@ -4195,4 +4193,42 @@ html{
 }
 .upgrade-btn{
   height: 50px;
+}
+
+.user-accounts-list{
+  background: rgb(250, 248, 248);
+  margin:3px;
+  min-height: 150px;
+  border: 2px solid rgb(218, 215, 215);
+}
+
+.message-selectors.active{
+border-bottom:  2px solid orange;
+}
+.message-selectors{
+  cursor: pointer;
+  text-align: center;
+}
+.messageContainer{
+  min-height: 400px;
+}
+.msg-list li{
+  border-bottom: 1px solid #eee;
+  border-top: 1px solid #eee;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+.unread{
+  font-weight: 800;
+}
+.icon-msg{
+  margin-right: 10px;
+}
+.messageLinks:link,.messageLinks:active,.messageLinks:visited{
+text-transform: none !important;
+text-decoration: none !important;
+color:inherit !important;
 }
