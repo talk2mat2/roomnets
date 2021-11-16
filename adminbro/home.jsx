@@ -92,6 +92,7 @@ const api = new ApiClient();
 const Dashboard = () => {
   const [data, setData] = useState({});
   const [ImageState, setImageState] = React.useState([]);
+  const [country, setCountry] = React.useState("");
   const [faqVisible, setfaqVisible] = React.useState(false);
   const [ImageState2, setImageState2] = React.useState({});
   const [Privacy, setPrivacy] = React.useState(false);
@@ -209,8 +210,12 @@ const Dashboard = () => {
     if (ImageState.length < 1) {
       return alert("You must select at least one image or more");
     }
+    if (!country) {
+      return alert("You must select a target country");
+    }
     var formData = new FormData();
-
+const countryData=JSON.stringify({country:country})
+formData.append('countryData',countryData)
     for (let x = 0; x < ImageState.length; x++) {
       formData.append("file", ImageState[x]["Uri"]);
     }
@@ -1097,11 +1102,35 @@ const Dashboard = () => {
             <br />
             <br />
           </small>
+          <div style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}>
           <input
             type="file"
             onChange={handleChange}
             accept="image/x-png,image/jpeg,image/gif"
           />
+             <Select
+                onChange={(e) =>
+                  setCountry(
+                   e.target.value,
+                  )
+                }
+                value={country}
+              >
+                <option value="NG">
+                  --Select Country*--
+                </option>
+                <option value="NG">Nigeria</option>
+                <option value="GH">Ghana</option>
+                <option value="KE">Kenya</option>
+                <option value="US">USA</option>
+                <option value="ZA">South-Africa</option>
+                <option value="IE">Ireland</option>
+                <option value="GB">UK</option>
+              </Select>
           <button
             type="submit"
             href="/admin"
@@ -1124,6 +1153,7 @@ const Dashboard = () => {
             </span>
             Upload
           </button>
+        </div>
         </Box>
       </form>
       <br />

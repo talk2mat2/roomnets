@@ -7,7 +7,13 @@ const  {sendmail} =require( "../middlewares/mailer")
 const Apartments = new Schema({
     no_rooms: String,
     Approved_By_Admin:{type:Boolean,default:false,enum:[true,false]},
-  
+  country:{type:String,enum:["NG",
+  "GB",
+  "US",
+   "GH",
+  "IE",
+  "KE",
+  "ZA"]},
     no_toilets:String,
     media: [{ uri: String }],
     isPaidAdd: {type:Boolean,default:false},

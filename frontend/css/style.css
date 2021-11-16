@@ -4232,3 +4232,6 @@ text-transform: none !important;
 text-decoration: none !important;
 color:inherit !important;
 }
+.cursor-pointer{
+  cursor: pointer;
+}

@@ -59,7 +59,13 @@ const {
   FetchReceivedMessages,
   FetchSentMessages,
   ListRoomsByMe,
-  ListApartByMe
+  deleteItemApartment,
+  ListApartByMe,
+  deleteItemRooms,
+  getPostApartById,
+  UpdatePostApartById,
+  UpdatePostRoomsById,
+  getPostRoomsById
 } = require("../controllers/user");
 
 var storage = multer.diskStorage({
@@ -117,6 +123,8 @@ Router.get("/ListRoomsByLnglat", ListRoomsByLnglat);
 Router.get("/BlogPostAllRecent/:country", BlogPostAllRecent);
 Router.get("/getPricesRates/:country", getPricesRates);
 Router.get("/LikeAPost/:postId",LoginbyJWT, LikeAPost);
+Router.get("/getPostApartById/:postId",LoginbyJWT, getPostApartById);
+Router.get("/getPostRoomsById/:postId",LoginbyJWT, getPostRoomsById);
 Router.get("/ListApartByLnglat", ListApartByLnglat);
 Router.get("/countDocuments", countDocuments);
 Router.post("/uploadBanners",multerUpload.array('file'), uploadBanners);
@@ -137,6 +145,10 @@ Router.get("/FetchReceivedMessages",LoginbyJWT,FetchReceivedMessages);
 Router.get("/FetchSentMessages",LoginbyJWT,FetchSentMessages);
 Router.get("/ListRoomsByMe",LoginbyJWT,ListRoomsByMe);
 Router.get("/ListApartByMe",LoginbyJWT,ListApartByMe);
+Router.get("/deleteItemApartment",LoginbyJWT,deleteItemApartment);
+Router.get("/deleteItemRooms",LoginbyJWT,deleteItemRooms);
+Router.put("/UpdatePostApartById",LoginbyJWT,UpdatePostApartById);
+Router.put("/UpdatePostRoomsById",LoginbyJWT,UpdatePostRoomsById);
 
 
 module.exports = Router;

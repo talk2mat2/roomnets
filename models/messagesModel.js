@@ -10,8 +10,8 @@ const MessagesSchema = new Schema({
     },
     receiver : {
         type : mongoose.Schema.Types.ObjectId,
-        refPath: 'onModel',
-        ref : 'Users'},
+        ref : 'Users'
+       },
     title : {type : String},
     body : {type : String},
     isDeleted:{type: Boolean,default:false}

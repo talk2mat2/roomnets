@@ -593,7 +593,9 @@ exports.ListRoomsByState = async (req, res) => {
 //list room by me
 
 exports.ListRoomsByMe = async (req, res) => {
-  const params = {posted_by:req.body.id}
+  const country = req.query.country
+  const params = {posted_by:req.body.id,country}
+  
 
   let total = await Rooms.countDocuments(params);
   const limit = 15;
@@ -697,8 +699,9 @@ await Apartments.find(params)
 //list apartment by me
 exports.ListApartByMe = async (req, res) => {
 // console.log("called")
-  const params = {posted_by:req.body.id}
-console.log(params)
+const country = req.query.country
+  const params = {posted_by:req.body.id,country}
+
 let total = await Apartments.countDocuments(params);
 const limit = 15;
 
@@ -1051,6 +1054,10 @@ exports.countDocuments = async (req, res) => {
 exports.uploadBanners = async (req, res) => {
   try {
     let Banners = new Array();
+    const countryDaTa= req.body
+    const{country} = JSON.parse(req.body.countryData)
+    console.log(country)
+    
     // console.log(req.files);
     for (const file of req.files) {
       let img = {
@@ -1059,12 +1066,33 @@ exports.uploadBanners = async (req, res) => {
       Banners.push(img);
     }
     // console.log(Banners);
+
+    const params= country == "KE"
+    ?{Banners_KE:Banners}
+    : country == "US"
+    ? {Banners_US:Banners}
+    : country == "NG"
+    ? {Banners_NG:Banners}
+    : country == "IE"
+    ? {Banners_IE:Banners}
+    : country == "ZA"
+    ? {Banners_ZA:Banners}
+    : country == "GB"
+    ? {Banners_GB:Banners}
+    : country == "GH"
+    ? {Banners_GH:Banners}
+    : {}
+
+
+    // const key=`Banners_${country}`
+    //   const params={key:Banners}
     const isHomeExist = await HomepageModels.findOne({ name: "home" });
     if (isHomeExist) {
       // console.log(isHomeExist)
+      
       await HomepageModels.findOneAndUpdate(
         { name: "home" },
-        { Banners: Banners },
+        params,
         {
           returnOriginal: false,
           useFindAndModify: false,
@@ -1078,9 +1106,9 @@ exports.uploadBanners = async (req, res) => {
         });
       });
     } else {
-      const newhomepageModel = new HomepageModels({
-        Banners: Banners,
-      });
+      const newhomepageModel = new HomepageModels(
+        params
+      );
       await newhomepageModel.save();
       return res.status(200).send({
         status: true,
@@ -1879,3 +1907,71 @@ exports.FetchReceivedMessages = async (req, res) => {
       return res.status(404).json({ message: "empty",status:false });
     });
 };
+
+exports.deleteItemApartment=async(req,res)=>{
+const item=req.query.item
+await Apartments.findByIdAndDelete(item).then(response=>{
+  return res.status(200).json({ message:"success" ,status:true});
+}).catch(error=>{
+  console.log(error)
+  return res.status(404).json({ message: "Operation not successful",status:false });
+})
+}
+exports.deleteItemRooms=async(req,res)=>{
+const item=req.query.item
+await Rooms.findByIdAndDelete(item).then(response=>{
+  return res.status(200).json({ message:"success" ,status:true});
+}).catch(error=>{
+  return res.status(404).json({ message: "Operation not successful",status:false });
+})
+}
+
+exports.getPostApartById= async(req,res)=>{
+  
+  const id = req.body.id;
+  const postId = req.params.postId;
+//get user only post
+  await Apartments.findOne({_id:postId}).select('-Approved_By_Admin -location -media -building_location').then(item=>{
+    return res.status(200).json({userData: item, message:"success" ,status:true});
+  }).catch(err=>{
+    return res.status(404).json({ message: "Operation not successful",status:false });
+  })
+
+  
+}
+exports.getPostRoomsById= async(req,res)=>{
+  
+  const id = req.body.id;
+  const postId = req.params.postId;
+//get user only post
+  await Rooms.findOne({_id:postId}).select('-Approved_By_Admin -location -media -building_location').then(item=>{
+    return res.status(200).json({userData: item, message:"success" ,status:true});
+  }).catch(err=>{
+    return res.status(404).json({ message: "Operation not successful",status:false });
+  })
+
+  
+}
+
+
+exports.UpdatePostApartById=async(req,res)=>{
+const {dataInfo,postId} = req.body
+
+await Apartments.findByIdAndUpdate(postId,dataInfo).then(response=>{
+  return res.status(200).json({ message:"success" ,status:true});
+}).catch(err=>{
+  console.log(err)
+  return res.status(404).json({ message: "Operation not successful",status:false });
+})
+}
+
+exports.UpdatePostRoomsById=async(req,res)=>{
+const {dataInfo,postId} = req.body
+
+await Rooms.findByIdAndUpdate(postId,dataInfo).then(response=>{
+  return res.status(200).json({ message:"success" ,status:true});
+}).catch(err=>{
+  console.log(err)
+  return res.status(404).json({ message: "Operation not successful",status:false });
+})
+}
