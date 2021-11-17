@@ -7,6 +7,7 @@ const Rooms = require("../models/rooms");
 const Blog = require("../models/blog");
 const AdRates = require("../models/AdRates");
 const Apartments = require("../models/apartments");
+const GoogleAdsense = require("../models/GoogleAdsense");
 const BlogComments = require("../models/BlogComments");
 var querystring = require('querystring');
 
@@ -331,13 +332,26 @@ exports.UpdateHomepageModels = async (req, res) => {
 };
 exports.fetchHomepageModels = async (req, res) => {
 
-  await HomepageModels.findOne({ name:"home"})
-    .then((response) => {
+  await HomepageModels.findOne({ name:"home"}).lean()
+    .then(async(response) => {
+      const GoogleAdsScript=await GoogleAdsense.findOne({})
+      if (GoogleAdsScript){
+        response.googleAdsScript=GoogleAdsScript.AdSenseCodeHtmlScript
+      
+        const newResponse={...response,googleAdsScript:GoogleAdsScript.AdSenseCodeHtmlScript}
+        return res.status(200).json({
+          status: true,
+          message: "fetch was successful",
+          userData: newResponse
+        });
+      }
+     else{
       return res.status(200).json({
         status: true,
         message: "fetch was successful",
-        userData: response,
+        userData: response
       });
+     }
     })
     .catch((error) => {
       return res.status(501).send({

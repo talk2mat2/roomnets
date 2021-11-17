@@ -1120,7 +1120,7 @@ formData.append('countryData',countryData)
                 }
                 value={country}
               >
-                <option value="NG">
+                <option value="">
                   --Select Country*--
                 </option>
                 <option value="NG">Nigeria</option>

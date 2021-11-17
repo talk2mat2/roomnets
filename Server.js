@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 const { SocketIo } = require("./socket.io");
 const Userschema = require("./models/userMoodel");
+const GoogleAdsense = require("./models/GoogleAdsense");
 const Rooms = require("./models/rooms");
 const Apartments = require("./models/apartments");
 const ContactMessage = require("./models/contactMessages");
@@ -86,6 +87,7 @@ const adminBro = new AdminBro({
         },
       },
     },
+    GoogleAdsense,
   ],
   branding: {
     companyName: "RoomNets",
