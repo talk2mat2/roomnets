@@ -3638,7 +3638,8 @@ background-color: rgba(44, 38, 30, 0.342);
     position: static;
   }
   .dropdown-menu{
-    background-color: transparent;
+    color:#f2f2f2 !important;
+    /* background-color: transparent; */
   }
   .p-md-30{
     padding: 30px
@@ -4234,4 +4235,11 @@ color:inherit !important;
 }
 .cursor-pointer{
   cursor: pointer;
+}
+.avataer-edit{
+background-color: #eee;
+
+border-radius: 100%;
+width:200px;
+height: 200px;;
 }
