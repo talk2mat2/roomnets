@@ -2082,11 +2082,10 @@ exports.UpdatePostRoomsById = async (req, res) => {
 };
 
 exports.updateMyProfile = async (req, res) => {
-  const data= req.body.formReponse
+  const data = req.body.formReponse;
 
-  const { firstName, lastName, mobileNumber } = data
+  const { firstName, lastName, mobileNumber } = JSON.parse(data)
 
-  
   const id = req.body.id;
   const params = req.file
     ? {
@@ -2100,11 +2099,16 @@ exports.updateMyProfile = async (req, res) => {
         lastName,
         mobileNumber,
       };
-  await UserSchema.findByIdAndUpdate(
-    { _id: id },
-   params,
-    { new: true, useFindAndModify: false }
-  )
+ 
+  for (let key in params) {
+    if (!params[key]) {
+      delete params[key];
+    }
+  }
+  await UserSchema.findByIdAndUpdate({ _id: id }, params, {
+    new: true,
+    useFindAndModify: false,
+  })
     .then((data) => {
       return res.json({
         userData: data,
