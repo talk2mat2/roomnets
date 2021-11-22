@@ -4241,5 +4241,13 @@ background-color: #eee;
 
 border-radius: 100%;
 width:200px;
-height: 200px;;
+height: 200px;
+}
+.avataer-edit img{
+
+
+border-radius: 100%;
+width:200px;
+height: 200px;
+object-fit: contain;
 }

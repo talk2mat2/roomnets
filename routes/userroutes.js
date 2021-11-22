@@ -65,7 +65,8 @@ const {
   getPostApartById,
   UpdatePostApartById,
   UpdatePostRoomsById,
-  getPostRoomsById
+  getPostRoomsById,
+  updateMyProfile
 } = require("../controllers/user");
 
 var storage = multer.diskStorage({
@@ -134,6 +135,7 @@ Router.post("/contactForm",contactForm);
 Router.post("/updateFaq",updateFaq);
 Router.post("/updateAboutUs", updateAboutUs);
 Router.post("/postComment",postComment);
+Router.post("/updateMyProfile",LoginbyJWT,multerUpload.single('file'),LoginbyJWT,updateMyProfile);
 Router.post("/handleUpgradeRooms",handleUpgradeRooms);
 Router.post("/handleUpgradeApart",handleUpgradeApart);
 Router.post("/handleUpgradesRoomPayPal",handleUpgradesRoomPayPal);

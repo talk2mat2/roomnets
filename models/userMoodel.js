@@ -7,6 +7,7 @@ const UserSchema = new Schema({
   lastName: String,
   salutation: String,
   sex: String,
+  imgUrl:String,
   mobileNumber: { type: String },
   dateOfBirh: String,
   martiatStatus: String,
