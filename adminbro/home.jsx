@@ -95,9 +95,11 @@ const Dashboard = () => {
   const [country, setCountry] = React.useState("");
   const [faqVisible, setfaqVisible] = React.useState(false);
   const [ImageState2, setImageState2] = React.useState({});
+  const [ImageState3, setImageState3] = React.useState({});
   const [Privacy, setPrivacy] = React.useState(false);
 
   const [blogpost, setBlogpost] = React.useState(false);
+  const [Partners, setPartners] = React.useState(false);
   const [Aboutus, setAboutus] = React.useState(false);
   const [loading, setloading] = React.useState(false);
   const [count, setCount] = useState({ no_Apart: 0, no_Rooms: 0, no_Users: 0 });
@@ -106,6 +108,12 @@ const Dashboard = () => {
     title: "",
     body: "",
     country: "",
+    image: "",
+  });
+  const [formResponse3, setFormResponse3] = React.useState({
+    name: "",
+    url: "",
+  
     image: "",
   });
   const [formResponse, setFormResponse] = React.useState({
@@ -297,6 +305,9 @@ formData.append('countryData',countryData)
   const handleBlog = () => {
     setBlogpost(true);
   };
+  const handlePartners = () => {
+    setPartners(true);
+  };
 
   function handleChange2(event) {
     if (
@@ -312,6 +323,29 @@ formData.append('countryData',countryData)
         // });
         // setImageState(newImagestate);
         setImageState2({
+          file: URL.createObjectURL(event.target.files[0]),
+          Uri: event.target.files[0],
+        });
+      }
+    } else {
+      return alert("select a valid image format");
+    }
+  }
+
+  function handleChange3(event) {
+    if (
+      event.target.files[0].type === "image/png" ||
+      event.target.files[0].type === "image/jpg" ||
+      event.target.files[0].type === "image/jpeg"
+    ) {
+      if (event.target.files[0]) {
+        // const newImagestate = ImageState;
+        // newImagestate.push({
+        //   file: URL.createObjectURL(event.target.files[0]),
+        //   Uri: event.target.files[0],
+        // });
+        // setImageState(newImagestate);
+        setImageState3({
           file: URL.createObjectURL(event.target.files[0]),
           Uri: event.target.files[0],
         });
@@ -352,10 +386,46 @@ formData.append('countryData',countryData)
         alert("An error has occured");
       });
   };
+  
+  const CreateNewPartner = async () => {
+    if (!formResponse3.name || !formResponse3.url) {
+      return alert("You didnt fill the Mandatory fields");
+    }
+    if (ImageState3.length < 1) {
+      return alert("You must select at least one Partner Image");
+    }
+    var formData = new FormData();
+    formData.append("userData", JSON.stringify(formResponse3));
+    // for (let x = 0; x < ImageState.length; x++) {
+    formData.append("file", ImageState3["Uri"]);
+
+    // dispatch(SETPOSTROOMPROCESS(formResponse));
+    setloading(true);
+    setPartners(false);
+    await axios({
+      // url: `${ProxyUrl}/users/PreRegister`,
+      url: `/Api/v1/createPartner`,
+      method: "POST",
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+      .then(function (response) {
+        setloading(false);
+          console.log(response.data);
+          alert(response.data.message)
+      })
+      .catch((err) => {
+        setloading(false);
+        console.log(response.data);
+        alert("An error has occured");
+      });
+  };
   return (
     <Box variant="grey">
       {/* <Box variant="white">some: {data.some}</Box> */}
-      <Box variant="white">
+      <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)",boxShadow: "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px"}} variant="white">
         <h2
           font-size="xl"
           className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
@@ -524,7 +594,7 @@ formData.append('countryData',countryData)
       {/* edit blog post */}
 
       {blogpost ? (
-        <FaqDiv>
+        <FaqDiv >
           <div
             onClick={() => setBlogpost(false)}
             style={{
@@ -620,6 +690,114 @@ formData.append('countryData',countryData)
           </div>
           <br />
           <button onClick={CreateNewBlogPost}>
+            <span
+              className="sc-giAqnE dqTeSL admin-bro_Icon"
+              color="grey100"
+            ></span>
+            Publish
+          </button>
+        </FaqDiv>
+      ) : null}
+          {Partners ? (
+        <FaqDiv >
+          <div
+            onClick={() => setPartners(false)}
+            style={{
+              float: "right",
+              cursor: "pointer",
+              color: "tomato",
+            }}
+          >
+            <h1>x</h1>
+          </div>
+
+          <div>
+            <h2 style={{ fontWeight: "bold", textAlign: "center" }}>
+             Add new site partners
+            </h2>
+          </div>
+
+          <br />
+          <label>
+            Partner Name <sup style={{color:"tomato"}}>*</sup>
+          </label>
+          <input
+            type="text"
+            value={formResponse3.name}
+            onChange={(e) =>
+              setFormResponse3({
+                ...formResponse3,
+                name: e.target.value,
+              })
+            }
+          />
+
+          <br />
+          <br />
+          <br />
+          <label>
+            Partner Url  <sup style={{color:"tomato"}}>*</sup>
+          </label>
+          <br />
+          <input
+            type="text"
+            value={formResponse3.url}
+            onChange={(e) =>
+              setFormResponse3({
+                ...formResponse3,
+                url: e.target.value,
+              })
+            }
+          />
+          <br />
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+           
+            <div>
+              <p>Select Image Logo</p>
+              <input
+                className="input2"
+                type="file"
+                onChange={handleChange3}
+                accept="image/x-png,image/jpeg,image/gif"
+              />
+            </div>
+            <div>
+           
+              <br />
+              <br />
+              <br />
+              <br />
+              {/* <Select
+                onChange={(e) =>
+                  setFormResponse2({
+                    ...formResponse2,
+                    country: e.target.value,
+                  })
+                }
+                value={formResponse2.country}
+              >
+                <option value="NG">
+                  --Select Country*--
+                </option>
+                <option value="NG">Nigeria</option>
+                <option value="GH">Ghana</option>
+                <option value="KE">Kenya</option>
+                <option value="US">USA</option>
+                <option value="ZA">South-Africa</option>
+                <option value="IE">Ireland</option>
+                <option value="GB">UK</option>
+              </Select> */}
+            </div>
+          </div>
+          <br />
+          <button onClick={CreateNewPartner}>
             <span
               className="sc-giAqnE dqTeSL admin-bro_Icon"
               color="grey100"
@@ -1072,7 +1250,7 @@ formData.append('countryData',countryData)
         </div> */}
 
         <br />
-        <Box variant="white">
+        <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)",boxShadow: "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px"}} variant="white">
           {loading ? <p>..Uploading</p> : null}
           <h5
             font-size="sm"
@@ -1158,7 +1336,7 @@ formData.append('countryData',countryData)
       </form>
       <br />
       <br />
-      <Box variant="white">
+      <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)",boxShadow: "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px"}} variant="white">
         <h5
           font-size="sm"
           className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
@@ -1186,7 +1364,7 @@ formData.append('countryData',countryData)
       </Box>
 
       <br />
-      <Box variant="white">
+      <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)",boxShadow: "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px"}} variant="white">
         <h5
           font-size="sm"
           className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
@@ -1195,7 +1373,7 @@ formData.append('countryData',countryData)
           Blog Posts
         </h5>
         <Line />
-        <Box>
+        <Box >
           <button
             type="submit"
             onClick={handleBlog}
@@ -1220,7 +1398,32 @@ formData.append('countryData',countryData)
           </button>
         </Box>
       </Box>
-
+      <br />
+      <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)"}} variant="white">
+        <h5
+          font-size="sm"
+          className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
+          font-weight="normal"
+        >
+         Site Partners 
+        </h5>  
+        <Line />
+        <Box>
+          <button
+            type="submit"
+            onClick={handlePartners}
+            data-testid="action-new"
+            className="sc-gtssRu sc-dvXXZy kGJZae eAtiBe admin-bro_ButtonGroupItem admin-bro_Button admin-bro_ButtonGroupItem"
+          >
+        
+           + Add new
+          </button>
+          <br/>
+          <br/>
+          <br/>
+          <small style={{color:"tomato"}}>**To delete partners navigate to homepage models and click edit</small>
+        </Box>
+      </Box>
       <br />
       <br />
       <br />

@@ -17,7 +17,16 @@ const HomepageModels = new Schema({
   Banners_NG:[{ uri: String }],
   privacy:[{title:String,body:String}],
   faq:[{title:String,body:String}],
-  aboutUs:[{title:String,body:String}]
+  aboutUs:[{title:String,body:String}],
+  SitePhone:{ type: String },
+  SiteEmail:{ type: String },
+  SiteOfficeAddress:{ type: String },
+  TwitterLink:{ type: String },
+  FacebookLink:{ type: String },
+  InstagramLink:{ type: String },
+  linkedinLink:{ type: String },
+  YoutubeLink:{ type: String },
+  partners:[{name:String,url:String,imagUri:String}]
 });
 
 module.exports = mongoose.model("HomepageModels", HomepageModels);

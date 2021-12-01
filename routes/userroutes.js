@@ -21,6 +21,7 @@ const {
   Login,
   ListRoomsByLocation,
   Register,
+  Subscribers,
   updateProfile,
   UpdateHomepageModels,
   ListRoomsByLnglat,
@@ -46,6 +47,7 @@ const {
   updateFaq,
   updateAboutUs,
   CreateBlog,
+  createPartner,
   BlogPostAllRecent,
   BlogPostAll,
   handleUpgradeRooms,
@@ -130,6 +132,7 @@ Router.get("/ListApartByLnglat", ListApartByLnglat);
 Router.get("/countDocuments", countDocuments);
 Router.post("/uploadBanners",multerUpload.array('file'), uploadBanners);
 Router.post("/createBlog",multerUpload.array('file'), CreateBlog);
+Router.post("/createPartner",multerUpload.array('file'), createPartner);
 Router.post("/updatePrivacy",updatePrivacy );
 Router.post("/contactForm",contactForm);
 Router.post("/updateFaq",updateFaq);
@@ -151,6 +154,7 @@ Router.get("/deleteItemApartment",LoginbyJWT,deleteItemApartment);
 Router.get("/deleteItemRooms",LoginbyJWT,deleteItemRooms);
 Router.put("/UpdatePostApartById",LoginbyJWT,UpdatePostApartById);
 Router.put("/UpdatePostRoomsById",LoginbyJWT,UpdatePostRoomsById);
+Router.post("/Subscribers",Subscribers);
 
 
 module.exports = Router;

@@ -35,6 +35,7 @@ const locale = {
     labels: {
       // change Heading for Login
       loginWelcome: "Admin",
+      homepageModels: "Homepage Content"
     },
     messages: {
       loginWelcome: "Welcome to admin section",
@@ -46,14 +47,144 @@ const adminBro = new AdminBro({
   Databases: [connection],
   rootPath: "/admin",
   loginPath: "/admin/login",
-  locale,
+
   resources: [
-    Userschema,
-    Rooms,
-    Apartments,
-    ContactMessage,
-    homepageModels,
+    {
+      resource:Userschema,
+      options: {
+        properties: {
+          _id: {
+            isVisible: { list: false, filter: false, show: true, edit: true },
+          },
+          imgUrl: {
+            isVisible: { list: false, filter: false, show: true, edit: true },
+          },
+          Password: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+        },
+      },
+    },
+    
+    {
+      resource: Rooms,
+      options: {
+        properties: {
+          _id: {
+            isVisible: { list: false, filter: false, show: true, edit: true },
+          },
+          media: {
+            isVisible: { list: false, filter: false, show: true, edit: true },
+          },
+          location: {
+            isVisible: { list: false, filter: false, show: true, edit: false },
+          },
+        },
+      },
+    }, 
+    {
+      resource:   Apartments,
+      options: {
+        properties: {
+          _id: {
+            isVisible: { list: false, filter: false, show: true, edit: true },
+          },
+          media: {
+            isVisible: { list: false, filter: false, show: true, edit: true },
+          },
+          location: {
+            isVisible: { list: false, filter: false, show: true, edit: false },
+          },
+          locationType: {
+            isVisible: { list: false, filter: false, show: true, edit: false },
+          },
+          locationCoordinates: {
+            isVisible: { list: false, filter: false, show: true, edit: false },
+          },
+          Building_type: {
+            isVisible: { list: false, filter: false, show: true, edit: false },
+          },
+          isPaidAdd: {
+            isVisible: { list: false, filter: false, show: true, edit: false },
+          },
+          rent: {
+            isVisible: { list: false, filter: false, show: true, edit: false },
+          },
+        },
+      },
+    },
    
+    {
+      resource: homepageModels,
+      options: {
+        properties: {
+          aboutUs: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          faq: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          privacy: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          Banners_NG: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          Banners_ZA: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          Banners_KE: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          Banners_IE: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          Banners_GH: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          Banners_GB: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          Banners_US: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          Banners: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          RecentApartments: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          RecentRooms: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          name: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          videoUrl: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          _id: {
+            isVisible: { list: false, filter: false, show: false, edit: false },
+          },
+          InstagramLink: {
+            isVisible: { list: false, filter: false, show: true, edit: true },
+          },
+          linkedinLink: {
+            isVisible: { list: false, filter: false, show: true, edit: true },
+          },
+          FacebookLink: {
+            isVisible: { list: false, filter: false, show: true, edit: true },
+          },
+          SiteOfficeAddress: {
+            isVisible: { list: false, filter: false, show: true, edit: true },
+          },
+          YoutubeLink: {
+            isVisible: { list: false, filter: false, show: true, edit: true },
+          },
+        },
+      },
+    },
+
     {
       resource: Blogs,
       options: {
@@ -61,14 +192,46 @@ const adminBro = new AdminBro({
           body: {
             isVisible: { list: false, filter: false, show: true, edit: true },
           },
+          _id: {
+            isVisible: { list: false, filter: false, show: true, edit: true },
+          },
+          imagUri: {
+            isVisible: { list: false, filter: false, show: true, edit: true },
+          },
+          updated_a: {
+            isVisible: { list: false, filter: false, show: true, edit: true },
+          },
+          created_at: {
+            isVisible: { list: false, filter: false, show: true, edit: true },
+          },
         },
       },
     },
+ 
     {
       resource: Blogscomments,
       options: {
         properties: {
           body: {
+            isVisible: { list: false, filter: false, show: true, edit: false },
+          },
+          _id: {
+            isVisible: { list: false, filter: false, show: true, edit: false },
+          },
+          comments_for_post: {
+            isVisible: { list: false, filter: false, show: true, edit: false },
+          },
+        },
+      },
+    },
+    {
+      resource:  ContactMessage,
+      options: {
+        properties: {
+    message: {
+            isVisible: { list: false, filter: false, show: true, edit: false },
+          },
+    _id: {
             isVisible: { list: false, filter: false, show: true, edit: false },
           },
         },
@@ -88,7 +251,7 @@ const adminBro = new AdminBro({
       },
     },
     GoogleAdsense,
-  ],
+  ],  locale,
   branding: {
     companyName: "RoomNets",
     softwareBrothers: false,

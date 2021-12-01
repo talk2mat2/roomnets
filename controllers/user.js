@@ -7,6 +7,7 @@ const Rooms = require("../models/rooms");
 const Blog = require("../models/blog");
 const AdRates = require("../models/AdRates");
 const Apartments = require("../models/apartments");
+const Subscribers = require("../models/subscribers");
 const GoogleAdsense = require("../models/GoogleAdsense");
 const BlogComments = require("../models/BlogComments");
 var querystring = require("querystring");
@@ -1136,7 +1137,7 @@ exports.uploadBanners = async (req, res) => {
         });
       });
     } else {
-      const newhomepageModel = new HomepageModels(params);
+      const newhomepageModel = new HomepageModels({...params,name:"home"});
       await newhomepageModel.save();
       return res.status(200).send({
         status: true,
@@ -1181,7 +1182,7 @@ exports.updatePrivacy = async (req, res) => {
       });
     });
   } else {
-    const newhomepageModel = new HomepageModels({
+    const newhomepageModel = new HomepageModels({name:"home",
       privacy: [{ title, body }],
     });
     await newhomepageModel.save();
@@ -1220,7 +1221,7 @@ exports.updateFaq = async (req, res) => {
       });
     });
   } else {
-    const newhomepageModel = new HomepageModels({
+    const newhomepageModel = new HomepageModels({name:"home",
       faq: [{ title, body }],
     });
     await newhomepageModel.save();
@@ -1259,7 +1260,7 @@ exports.updateAboutUs = async (req, res) => {
       });
     });
   } else {
-    const newhomepageModel = new HomepageModels({
+    const newhomepageModel = new HomepageModels({name:"home",
       aboutUs: [{ title, body }],
     });
     await newhomepageModel.save();
@@ -1357,6 +1358,58 @@ exports.CreateBlog = async (req, res) => {
     }
   });
 };
+
+exports.createPartner= async(req,res)=>{
+  const { userData } = req.body;
+  const { name, url } = JSON.parse(userData);
+
+  if (!name || !url) {
+    return res.status(404).json({
+      status: false,
+      message: " All field s not supplied",
+    });
+  }
+
+  let newFiles = new Array();
+  if (req.files.length > 0) {
+    for (const file of req.files) {
+      let img = {
+        uri: `${process.env.WEB_URL}` + "/api/v1/media/" + file.filename,
+      };
+      newFiles.push(img);
+    }
+  }
+  let params =
+    req.files.length > 0
+      ? {
+          name,
+          url,
+          
+          imagUri: newFiles[0]["uri"],
+        }
+      : {
+        name,
+        url,
+        };
+
+        const isHomeExist = await HomepageModels.findOne({ name: "home" });
+        if (isHomeExist) {
+
+          await isHomeExist.updateOne({partners:[...isHomeExist.partners,params]})
+        
+          return res.status(201).send({
+            status: true,
+            message: "Operation was successful",
+          });
+        }
+        if (!isHomeExist) {
+
+          const newHomepageModels = new HomepageModels({ name: "home",partners:[params] })
+
+        }
+
+
+}
 
 exports.postComment = async (req, res) => {
   const { title, body, commentedBy, comments_for_post } = req.body;
@@ -2118,9 +2171,36 @@ exports.updateMyProfile = async (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      res.status(501).send({
+      return res.status(501).send({
         message: "an error occured,unable update post to premiumt",
         status: false,
       });
     });
 };
+
+exports.Subscribers=async (req,res)=>{
+try{
+  const newSubscribers =new Subscribers({Email:req.body.email})
+  const isExist = await Subscribers.findOne({Email:req.body.email})
+  if (isExist){
+    return res.status(404).send({
+      message: "You have already subscribed before,thank you for subscribing",
+      status: false,
+    });
+  }
+await newSubscribers.save()
+return res.status(200).json({
+ 
+  status: true,
+  message: "Thank you for subscribing",
+})
+}
+catch(err){
+  console.log(err)
+return  res.status(501).send({
+  message: "An error occured,unable to subscribe",
+  status: false,
+});
+}
+
+}
