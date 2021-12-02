@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 const { SocketIo } = require("./socket.io");
 const Userschema = require("./models/userMoodel");
+const Subscribers=require("./models/subscribers");
 const GoogleAdsense = require("./models/GoogleAdsense");
 const Rooms = require("./models/rooms");
 const Apartments = require("./models/apartments");
@@ -49,6 +50,7 @@ const adminBro = new AdminBro({
   loginPath: "/admin/login",
 
   resources: [
+    
     {
       resource:Userschema,
       options: {
@@ -113,7 +115,7 @@ const adminBro = new AdminBro({
         },
       },
     },
-   
+    Subscribers,
     {
       resource: homepageModels,
       options: {
