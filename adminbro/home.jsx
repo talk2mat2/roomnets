@@ -96,6 +96,7 @@ const Dashboard = () => {
   const [faqVisible, setfaqVisible] = React.useState(false);
   const [ImageState2, setImageState2] = React.useState({});
   const [ImageState3, setImageState3] = React.useState({});
+  const [ImageState5, setImageState5] = React.useState({});
   const [Privacy, setPrivacy] = React.useState(false);
 
   const [blogpost, setBlogpost] = React.useState(false);
@@ -213,6 +214,25 @@ const Dashboard = () => {
     }
   }
 
+  function handleChange5(event) {
+   
+    if (
+      event.target.files[0].type === "image/png" ||
+      event.target.files[0].type === "image/jpg" ||
+      event.target.files[0].type === "image/jpeg" ||
+      event.target.files[0].type === "image/gif"
+    ) {
+      if (event.target.files[0]) {
+        // const newImagestate = ImageState;
+        setImageState5({
+          file: URL.createObjectURL(event.target.files[0]),
+          Uri: event.target.files[0],
+        });
+      }
+    } else {
+      return alert("select a valid image format");
+    }
+  }
   const UploadNow = async (e) => {
     e.preventDefault();
     if (ImageState.length < 1) {
@@ -386,7 +406,41 @@ formData.append('countryData',countryData)
         alert("An error has occured");
       });
   };
-  
+  const CreateSliderImages = async (e) => {
+ e.preventDefault()
+    if (!ImageState5.Uri) {
+      return alert("You must select at least one  slider Image");
+    }
+    var formData = new FormData();
+    
+    // formData.append("userData", JSON.stringify(formResponse3));
+    // for (let x = 0; x < ImageState.length; x++) {
+    formData.append("file", ImageState5["Uri"]);
+
+    // dispatch(SETPOSTROOMPROCESS(formResponse));
+    setloading(true);
+    setPartners(false);
+    await axios({
+      // url: `${ProxyUrl}/users/PreRegister`,
+      url: `/Api/v1/createSliders`,
+      method: "POST",
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+      .then(function (response) {
+        setloading(false);
+          console.log(response.data);
+          alert(response.data.message)
+          setImageState5({})
+      })
+      .catch((err) => {
+        setloading(false);
+        console.log(response.data);
+        alert("An error has occured");
+      });
+  };
   const CreateNewPartner = async () => {
     if (!formResponse3.name || !formResponse3.url) {
       return alert("You didnt fill the Mandatory fields");
@@ -426,7 +480,7 @@ formData.append('countryData',countryData)
     <Box variant="grey">
       {/* <Box variant="white">some: {data.some}</Box> */}
       <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)",boxShadow: "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px"}} variant="white">
-        <h2
+        <h2  style={{fontWeight:"bold"}}
           font-size="xl"
           className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
           font-weight="normal"
@@ -1252,7 +1306,7 @@ formData.append('countryData',countryData)
         <br />
         <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)",boxShadow: "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px"}} variant="white">
           {loading ? <p>..Uploading</p> : null}
-          <h5
+          <h5  style={{fontWeight:"bold"}}
             font-size="sm"
             className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
             font-weight="normal"
@@ -1274,9 +1328,9 @@ formData.append('countryData',countryData)
           <small className="sc-dIvqjp  sc-fKgIG">
             <i>Select up to 2 images and click on upload</i>
             <br />
-            <i>Image 1 size (landscape) 2088 px x 144 px</i>
+            <i> (Header banner) Image 1 size (landscape) 2088 px x 144 px</i>
             <br />
-            <i>Image 2 size (portrait) 144 px x 2088 px </i>
+            <i>(Side banner) Image 2 size (portrait) 144 px x 2088 px </i>
             <br />
             <br />
           </small>
@@ -1332,12 +1386,87 @@ formData.append('countryData',countryData)
             Upload
           </button>
         </div>
+
+        <br/>
+          <small style={{color:"tomato"}}>**To delete Banners image  navigate to homepage models and click edit then<br/> delete banner for a choosen country</small>
         </Box>
       </form>
+      <br/>
+
+      <form onSubmit={CreateSliderImages }>
+      <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)",boxShadow: "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px"}} variant="white">
+          {loading ? <p>..Uploading</p> : null}
+          <h5  style={{fontWeight:"bold"}}
+            font-size="sm"
+            className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
+            font-weight="normal"
+          >
+         Home Page Sliders
+          </h5>
+          <Line />
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            {/* {mapImagestate()} */}
+          </div>
+          <br />
+
+          <small className="sc-dIvqjp  sc-fKgIG">
+            <i>Add slider images to landing page sliders</i> <br/>
+            <i  style={{fontWeight:"bold"}}>*Image size:1920 *900</i>
+       
+       
+            <br />
+            <br />
+          </small>
+          <div style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}>
+          <input
+            type="file"
+            onChange={handleChange5}
+            accept="image/x-png,image/jpeg,image/gif"
+          />
+          
+          <button
+            type="submit"
+      
+            href="/admin"
+            data-testid="action-new"
+            className="sc-gtssRu sc-dvXXZy kGJZae eAtiBe admin-bro_ButtonGroupItem admin-bro_Button admin-bro_ButtonGroupItem"
+          >
+            <span className="sc-giAqnE dqTeSL admin-bro_Icon" color="grey100">
+              <svg
+                focusable="false"
+                preserveAspectRatio="xMidYMid meet"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                width="16"
+                height="16"
+                viewBox="0 0 32 32"
+                aria-hidden="true"
+              >
+                <path d="M17 15L17 8 15 8 15 15 8 15 8 17 15 17 15 24 17 24 17 17 24 17 24 15z"></path>
+              </svg>
+            </span>
+            Upload
+          </button>
+      
+        </div>
+        <br/>
+          <small style={{color:"tomato"}}>**To delete Sliders image  navigate to homepage models and click edit and delete<br/> from sliders</small>
+        </Box>
+        </form>
       <br />
       <br />
       <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)",boxShadow: "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px"}} variant="white">
-        <h5
+        <h5  style={{fontWeight:"bold"}}
           font-size="sm"
           className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
           font-weight="normal"
@@ -1365,7 +1494,7 @@ formData.append('countryData',countryData)
 
       <br />
       <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)",boxShadow: "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px"}} variant="white">
-        <h5
+        <h5 style={{fontWeight:"bold"}}
           font-size="sm"
           className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
           font-weight="normal"
@@ -1400,7 +1529,7 @@ formData.append('countryData',countryData)
       </Box>
       <br />
       <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)"}} variant="white">
-        <h5
+        <h5  style={{fontWeight:"bold"}}
           font-size="sm"
           className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
           font-weight="normal"
@@ -1421,7 +1550,7 @@ formData.append('countryData',countryData)
           <br/>
           <br/>
           <br/>
-          <small style={{color:"tomato"}}>**To delete partners navigate to homepage models and click edit</small>
+          <small style={{color:"tomato"}}>**To delete partners navigate to homepage models and click edit and delete from <br/>partners</small>
         </Box>
       </Box>
       <br />

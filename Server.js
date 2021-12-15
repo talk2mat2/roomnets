@@ -130,25 +130,25 @@ const adminBro = new AdminBro({
             isVisible: { list: false, filter: false, show: false, edit: false },
           },
           Banners_NG: {
-            isVisible: { list: false, filter: false, show: false, edit: false },
+            isVisible: { list: false, filter: false, show: false, edit: true },
           },
           Banners_ZA: {
-            isVisible: { list: false, filter: false, show: false, edit: false },
+            isVisible: { list: false, filter: false, show: false, edit: true },
           },
           Banners_KE: {
-            isVisible: { list: false, filter: false, show: false, edit: false },
+            isVisible: { list: false, filter: false, show: false, edit: true },
           },
           Banners_IE: {
-            isVisible: { list: false, filter: false, show: false, edit: false },
+            isVisible: { list: false, filter: false, show: false, edit: true },
           },
           Banners_GH: {
-            isVisible: { list: false, filter: false, show: false, edit: false },
+            isVisible: { list: false, filter: false, show: false, edit: true },
           },
           Banners_GB: {
-            isVisible: { list: false, filter: false, show: false, edit: false },
+            isVisible: { list: false, filter: false, show: false, edit: true },
           },
           Banners_US: {
-            isVisible: { list: false, filter: false, show: false, edit: false },
+            isVisible: { list: false, filter: false, show: false, edit: true },
           },
           Banners: {
             isVisible: { list: false, filter: false, show: false, edit: false },

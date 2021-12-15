@@ -40,6 +40,7 @@ const {
   ListRoomsByState,
   PostAddApart,
   LikeAPost,
+  createSliders,
   SyncronizeUserData,
   ListApartByState,
   updatePrivacy,
@@ -133,6 +134,7 @@ Router.get("/countDocuments", countDocuments);
 Router.post("/uploadBanners",multerUpload.array('file'), uploadBanners);
 Router.post("/createBlog",multerUpload.array('file'), CreateBlog);
 Router.post("/createPartner",multerUpload.array('file'), createPartner);
+Router.post("/createSliders",multerUpload.array('file'), createSliders);
 Router.post("/updatePrivacy",updatePrivacy );
 Router.post("/contactForm",contactForm);
 Router.post("/updateFaq",updateFaq);
