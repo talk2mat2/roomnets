@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 const { SocketIo } = require("./socket.io");
 const Userschema = require("./models/userMoodel");
-const Subscribers=require("./models/subscribers");
+const Subscribers = require("./models/subscribers");
 const GoogleAdsense = require("./models/GoogleAdsense");
 const Rooms = require("./models/rooms");
 const Apartments = require("./models/apartments");
@@ -36,7 +36,7 @@ const locale = {
     labels: {
       // change Heading for Login
       loginWelcome: "Admin",
-      homepageModels: "Homepage Content"
+      homepageModels: "Homepage Content",
     },
     messages: {
       loginWelcome: "Welcome to admin section",
@@ -50,9 +50,8 @@ const adminBro = new AdminBro({
   loginPath: "/admin/login",
 
   resources: [
-    
     {
-      resource:Userschema,
+      resource: Userschema,
       options: {
         properties: {
           _id: {
@@ -67,7 +66,7 @@ const adminBro = new AdminBro({
         },
       },
     },
-    
+
     {
       resource: Rooms,
       options: {
@@ -83,9 +82,9 @@ const adminBro = new AdminBro({
           },
         },
       },
-    }, 
+    },
     {
-      resource:   Apartments,
+      resource: Apartments,
       options: {
         properties: {
           _id: {
@@ -209,7 +208,7 @@ const adminBro = new AdminBro({
         },
       },
     },
- 
+
     {
       resource: Blogscomments,
       options: {
@@ -227,13 +226,13 @@ const adminBro = new AdminBro({
       },
     },
     {
-      resource:  ContactMessage,
+      resource: ContactMessage,
       options: {
         properties: {
-    message: {
+          message: {
             isVisible: { list: false, filter: false, show: true, edit: false },
           },
-    _id: {
+          _id: {
             isVisible: { list: false, filter: false, show: true, edit: false },
           },
         },
@@ -253,7 +252,8 @@ const adminBro = new AdminBro({
       },
     },
     GoogleAdsense,
-  ],  locale,
+  ],
+  locale,
   branding: {
     companyName: "RoomNets",
     softwareBrothers: false,
