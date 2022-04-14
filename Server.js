@@ -3,6 +3,10 @@ const App = express();
 const connectDB = require("./db/connection");
 const cors = require("cors");
 const UserRoutes = require("./routes/userroutes");
+const {
+  delete7daysApartment,
+  delete7daysRooms,
+} = require("./middlewares/delete7dayAdd");
 const mongoose = require("mongoose");
 const path = require("path");
 const { SocketIo } = require("./socket.io");
@@ -12,6 +16,9 @@ const GoogleAdsense = require("./models/GoogleAdsense");
 const Rooms = require("./models/rooms");
 const Apartments = require("./models/apartments");
 const ContactMessage = require("./models/contactMessages");
+const HowItWorks = require("./models/howItWorks");
+const accessibilityStatement = require("./models/accesibility");
+const whyChooseUs = require("./models/whyChooseUs");
 const Blogs = require("./models/blog");
 const Blogscomments = require("./models/BlogComments");
 const AdRates = require("./models/AdRates");
@@ -252,6 +259,36 @@ const adminBro = new AdminBro({
       },
     },
     GoogleAdsense,
+    {
+      resource: HowItWorks,
+      options: {
+        properties: {
+          body: {
+            type: "richtext",
+          },
+        },
+      },
+    },
+    {
+      resource: whyChooseUs,
+      options: {
+        properties: {
+          body: {
+            type: "richtext",
+          },
+        },
+      },
+    },
+    {
+      resource: accessibilityStatement,
+      options: {
+        properties: {
+          body: {
+            type: "richtext",
+          },
+        },
+      },
+    },
   ],
   locale,
   branding: {
@@ -325,7 +362,7 @@ App.use("/api/v1", UserRoutes);
 App.get("/admin2", (req, res) => {
   res.sendFile(path.join(__dirname, "./admin2", "index.html"));
 });
-App.get("/*", (req, res) => {
+App.get("/*", delete7daysRooms,delete7daysApartment, (req, res) => {
   res.sendFile(path.join(__dirname, "./frontend", "index.html"));
 });
 

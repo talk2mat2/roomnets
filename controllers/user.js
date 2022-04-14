@@ -5,6 +5,9 @@ const MessagesSchema = require("../models/messagesModel");
 const ContactMessages = require("../models/contactMessages");
 const Rooms = require("../models/rooms");
 const Blog = require("../models/blog");
+const HowItWorks = require("../models/howItWorks");
+const Accesibility = require("../models/accesibility");
+const WhyChooseUs = require("../models/whyChooseUs");
 const AdRates = require("../models/AdRates");
 const Apartments = require("../models/apartments");
 const Subscribers = require("../models/subscribers");
@@ -598,6 +601,9 @@ exports.ListRoomsByState = async (req, res) => {
 
   await Rooms.find(params)
     .populate("posted_by", "-Password")
+    .limit(limit)
+    .skip(skip)
+    .sort({ isPaidAdd: -1, created_at: -1, isTopAdd: -1 })
     .then((response) => {
       return res.status(200).send({
         status: true,
@@ -671,7 +677,7 @@ exports.ListApartByState = async (req, res) => {
     .populate("posted_by", "-Password")
     .limit(limit)
     .skip(skip)
-    .sort({ isPaidAdd: -1 })
+    .sort({ isPaidAdd: -1, created_at: -1, isTopAdd: -1 })
     .then((response) => {
       return res.status(200).send({
         status: true,
@@ -741,7 +747,7 @@ exports.ListApartByMe = async (req, res) => {
     .populate("posted_by", "-Password")
     .limit(limit)
     .skip(skip)
-    .sort({ isPaidAdd: -1 })
+    .sort({ isPaidAdd: -1, created_at: -1 })
     .then((response) => {
       return res.status(200).send({
         status: true,
@@ -837,7 +843,7 @@ exports.ListRoomsByLocation = async (req, res) => {
     .populate("posted_by", "-Password")
     .limit(limit)
     .skip(skip)
-    .sort({ isPaidAdd: -1 })
+    .sort({ isPaidAdd: -1, created_at: -1 })
     .then((response) => {
       return res.status(200).send({
         status: true,
@@ -879,7 +885,7 @@ exports.ListApartByLocation = async (req, res) => {
     .populate("posted_by", "-Password")
     .limit(limit)
     .skip(skip)
-    .sort({ isPaidAdd: -1 })
+    .sort({ isPaidAdd: -1, created_at: -1 })
     .then((response) => {
       return res.status(200).send({
         status: true,
@@ -927,7 +933,7 @@ exports.ListRoomsByLnglat = async (req, res) => {
             distanceField: "distance",
           },
         },
-        { $sort: { isPaidAdd: -1, distance: 1 } },
+        { $sort: { isPaidAdd: -1, distance: 1, created_at: -1 } },
         { $limit: limit },
         { $unset: "Password" },
         { $skip: skip },
@@ -1011,7 +1017,7 @@ exports.ListApartByLnglat = async (req, res) => {
             distanceField: "distance",
           },
         },
-        { $sort: { isPaidAdd: -1, distance: 1 } },
+        { $sort: { isPaidAdd: -1, distance: 1, created_at: -1 } },
         { $limit: 7 },
         { $unset: "Password" },
         { $skip: skip },
@@ -1412,7 +1418,7 @@ exports.createPartner = async (req, res) => {
       partners: [params],
     });
 
-    await newHomepageModels.save()
+    await newHomepageModels.save();
     return res.status(201).send({
       status: true,
       message: "Operation was successful",
@@ -2249,4 +2255,56 @@ exports.Subscribers = async (req, res) => {
       status: false,
     });
   }
+};
+
+exports.fetchHowItWorks = async (req, res) => {
+  await HowItWorks.find({})
+    .then((rest) => {
+      return res.status(200).json({
+        userData: rest,
+        status: true,
+        message: "success",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(501).send({
+        message: "An error occured,unable to subscribe",
+        status: false,
+      });
+    });
+};
+exports.fetchAsesibility = async (req, res) => {
+  await Accesibility.find({})
+    .then((rest) => {
+      return res.status(200).json({
+        userData: rest,
+        status: true,
+        message: "success",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(501).send({
+        message: "An error occured,unable to subscribe",
+        status: false,
+      });
+    });
+};
+exports.fetchWhyChooseUs = async (req, res) => {
+  await WhyChooseUs.find({})
+    .then((rest) => {
+      return res.status(200).json({
+        userData: rest,
+        status: true,
+        message: "success",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(501).send({
+        message: "An error occured,unable to subscribe",
+        status: false,
+      });
+    });
 };

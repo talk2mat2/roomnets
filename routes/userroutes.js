@@ -4,7 +4,7 @@ const { LoginbyJWT } = require("../middlewares/auth");
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
-const {multerUpload} = require('../middlewares/multerUpload')
+const { multerUpload } = require("../middlewares/multerUpload");
 const Router = express.Router();
 const uploadImage = require("../middlewares/grfsUpload");
 
@@ -29,7 +29,10 @@ const {
   fetchHomepageModels,
   isUserRegistered,
   MediaImage,
+  fetchWhyChooseUs,
+  fetchAsesibility,
   countDocuments,
+  fetchHowItWorks,
   BlogById,
   postComment,
   ListApartByLocation,
@@ -69,7 +72,7 @@ const {
   UpdatePostApartById,
   UpdatePostRoomsById,
   getPostRoomsById,
-  updateMyProfile
+  updateMyProfile,
 } = require("../controllers/user");
 
 var storage = multer.diskStorage({
@@ -112,9 +115,24 @@ Router.post("/Register", Register);
 Router.post("/updateProfile", LoginbyJWT, updateProfile);
 Router.get("/upload/:filename", MediaImage);
 Router.post("/UpdateHomepageModels", LoginbyJWT, UpdateHomepageModels);
-Router.post("/PostAddRoms", LoginbyJWT,multerUpload.array('file'),LoginbyJWT, PostAddRooms);
-Router.post("/PostAddApart", LoginbyJWT,multerUpload.array('file'),LoginbyJWT, PostAddApart);
+Router.post(
+  "/PostAddRoms",
+  LoginbyJWT,
+  multerUpload.array("file"),
+  LoginbyJWT,
+  PostAddRooms
+);
+Router.post(
+  "/PostAddApart",
+  LoginbyJWT,
+  multerUpload.array("file"),
+  LoginbyJWT,
+  PostAddApart
+);
 Router.get("/fetchHomepageModels", fetchHomepageModels);
+Router.get("/fetchHowItWorks", fetchHowItWorks);
+Router.get("/fetchWhyChooseUs", fetchWhyChooseUs);
+Router.get("/fetchAsesibility", fetchAsesibility);
 Router.get("/isUserRegistered/:email", isUserRegistered);
 Router.get("/media/:fileName", media);
 Router.get("/ListRoomsByState/:state", ListRoomsByState);
@@ -126,37 +144,42 @@ Router.get("/ListApartByLocation", ListApartByLocation);
 Router.get("/ListRoomsByLnglat", ListRoomsByLnglat);
 Router.get("/BlogPostAllRecent/:country", BlogPostAllRecent);
 Router.get("/getPricesRates/:country", getPricesRates);
-Router.get("/LikeAPost/:postId",LoginbyJWT, LikeAPost);
-Router.get("/getPostApartById/:postId",LoginbyJWT, getPostApartById);
-Router.get("/getPostRoomsById/:postId",LoginbyJWT, getPostRoomsById);
+Router.get("/LikeAPost/:postId", LoginbyJWT, LikeAPost);
+Router.get("/getPostApartById/:postId", LoginbyJWT, getPostApartById);
+Router.get("/getPostRoomsById/:postId", LoginbyJWT, getPostRoomsById);
 Router.get("/ListApartByLnglat", ListApartByLnglat);
 Router.get("/countDocuments", countDocuments);
-Router.post("/uploadBanners",multerUpload.array('file'), uploadBanners);
-Router.post("/createBlog",multerUpload.array('file'), CreateBlog);
-Router.post("/createPartner",multerUpload.array('file'), createPartner);
-Router.post("/createSliders",multerUpload.array('file'), createSliders);
-Router.post("/updatePrivacy",updatePrivacy );
-Router.post("/contactForm",contactForm);
-Router.post("/updateFaq",updateFaq);
+Router.post("/uploadBanners", multerUpload.array("file"), uploadBanners);
+Router.post("/createBlog", multerUpload.array("file"), CreateBlog);
+Router.post("/createPartner", multerUpload.array("file"), createPartner);
+Router.post("/createSliders", multerUpload.array("file"), createSliders);
+Router.post("/updatePrivacy", updatePrivacy);
+Router.post("/contactForm", contactForm);
+Router.post("/updateFaq", updateFaq);
 Router.post("/updateAboutUs", updateAboutUs);
-Router.post("/postComment",postComment);
-Router.post("/updateMyProfile",LoginbyJWT,multerUpload.single('file'),LoginbyJWT,updateMyProfile);
-Router.post("/handleUpgradeRooms",handleUpgradeRooms);
-Router.post("/handleUpgradeApart",handleUpgradeApart);
-Router.post("/handleUpgradesRoomPayPal",handleUpgradesRoomPayPal);
-Router.post("/handleUpgradesApartPayPal",handleUpgradesApartPayPal);
-Router.post("/handleUpgradeAccount",handleUpgradeAccount);
-Router.post("/handleUpgradesAccountPayPal",handleUpgradesAccountPayPal);
-Router.post("/sendMessages",LoginbyJWT,sendMessages);
-Router.get("/FetchReceivedMessages",LoginbyJWT,FetchReceivedMessages);
-Router.get("/FetchSentMessages",LoginbyJWT,FetchSentMessages);
-Router.get("/ListRoomsByMe",LoginbyJWT,ListRoomsByMe);
-Router.get("/ListApartByMe",LoginbyJWT,ListApartByMe);
-Router.get("/deleteItemApartment",LoginbyJWT,deleteItemApartment);
-Router.get("/deleteItemRooms",LoginbyJWT,deleteItemRooms);
-Router.put("/UpdatePostApartById",LoginbyJWT,UpdatePostApartById);
-Router.put("/UpdatePostRoomsById",LoginbyJWT,UpdatePostRoomsById);
-Router.post("/Subscribers",Subscribers);
-
+Router.post("/postComment", postComment);
+Router.post(
+  "/updateMyProfile",
+  LoginbyJWT,
+  multerUpload.single("file"),
+  LoginbyJWT,
+  updateMyProfile
+);
+Router.post("/handleUpgradeRooms", handleUpgradeRooms);
+Router.post("/handleUpgradeApart", handleUpgradeApart);
+Router.post("/handleUpgradesRoomPayPal", handleUpgradesRoomPayPal);
+Router.post("/handleUpgradesApartPayPal", handleUpgradesApartPayPal);
+Router.post("/handleUpgradeAccount", handleUpgradeAccount);
+Router.post("/handleUpgradesAccountPayPal", handleUpgradesAccountPayPal);
+Router.post("/sendMessages", LoginbyJWT, sendMessages);
+Router.get("/FetchReceivedMessages", LoginbyJWT, FetchReceivedMessages);
+Router.get("/FetchSentMessages", LoginbyJWT, FetchSentMessages);
+Router.get("/ListRoomsByMe", LoginbyJWT, ListRoomsByMe);
+Router.get("/ListApartByMe", LoginbyJWT, ListApartByMe);
+Router.get("/deleteItemApartment", LoginbyJWT, deleteItemApartment);
+Router.get("/deleteItemRooms", LoginbyJWT, deleteItemRooms);
+Router.put("/UpdatePostApartById", LoginbyJWT, UpdatePostApartById);
+Router.put("/UpdatePostRoomsById", LoginbyJWT, UpdatePostRoomsById);
+Router.post("/Subscribers", Subscribers);
 
 module.exports = Router;

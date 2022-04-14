@@ -47,6 +47,8 @@ const Apartments = new Schema({
     amenities_others: Boolean,
     existing_room_mates: Object,
     new_room_mate: Object,
+    add_start_date: String,
+    add_end_date: String,
     advert_title: String,
     currency:String,
     advert_description: String,
