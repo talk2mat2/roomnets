@@ -3,6 +3,7 @@ const Apartment = require("../models/apartments");
 exports.delete7daysRooms = async (req, res, next) => {
   await Rooms.find({}).then(async (item) => {
     if (item.length > 0) {
+      const expiredAdd = [];
       item.map((roomPost, index) => {
         const date1 = new Date(roomPost?.created_at);
         const date2 = new Date();
@@ -11,9 +12,14 @@ exports.delete7daysRooms = async (req, res, next) => {
 
         if (diffDays > 6 && !roomPost.isPaidAdd) {
           //  await Rooms.deleteOne({_id:roomPost.id})
-          console.log(roomPost.id);
+          expiredAdd.push(roomPost.id);
         }
       });
+      if (expiredAdd.length > 0) {
+          await Apartment.deleteMany({ _id: { $in: expiredAdd } }, function (err) {
+            console.log("deleted expired adds");
+          });
+      }
     }
     next();
   });
@@ -33,9 +39,11 @@ exports.delete7daysApartment = async (req, resp, next) => {
           expiredAdd.push(roomPost.id);
         }
       });
-    //   await Apartment.deleteMany({ _id: { $in: expiredAdd } }, function (err) {
-    //     console.log("deleted expired adds");
-    //   });
+      if (expiredAdd.length > 0) {
+          await Apartment.deleteMany({ _id: { $in: expiredAdd } }, function (err) {
+            console.log("deleted expired adds");
+          });
+      }
     }
     next();
   });
