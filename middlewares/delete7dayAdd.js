@@ -5,7 +5,7 @@ exports.delete7daysRooms = async (req, res, next) => {
     if (item.length > 0) {
       const expiredAdd = [];
       item.map((roomPost, index) => {
-        const date1 = new Date(roomPost?.created_at);
+        const date1 = new Date(roomPost.created_at);
         const date2 = new Date();
         const diffTime = Math.abs(date2 - date1);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -29,7 +29,7 @@ exports.delete7daysApartment = async (req, resp, next) => {
     if (item.length > 0) {
       const expiredAdd = [];
       item.map((roomPost, index) => {
-        const date1 = new Date(roomPost?.created_at);
+        const date1 = new Date(roomPost.created_at);
         const date2 = new Date();
         const diffTime = Math.abs(date2 - date1);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
