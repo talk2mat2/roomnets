@@ -17,6 +17,7 @@ const Apartments = new Schema({
     no_toilets:String,
     media: [{ uri: String }],
     isPaidAdd: {type:Boolean,default:false},
+    isTopAdd: {type:Boolean,default:false},
     // paid_add: String,
     location: {
         type: { type: String },

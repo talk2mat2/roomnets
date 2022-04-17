@@ -30,6 +30,9 @@ const {
   isUserRegistered,
   MediaImage,
   fetchWhyChooseUs,
+  PostHow,
+  PostAccess,
+  PostWhyChooseUs,
   fetchAsesibility,
   countDocuments,
   fetchHowItWorks,
@@ -156,6 +159,9 @@ Router.post("/createSliders", multerUpload.array("file"), createSliders);
 Router.post("/updatePrivacy", updatePrivacy);
 Router.post("/contactForm", contactForm);
 Router.post("/updateFaq", updateFaq);
+Router.post("/PostWhyChooseUs", PostWhyChooseUs);
+Router.post("/PostHow", PostHow);
+Router.post("/PostAccess", PostAccess);
 Router.post("/updateAboutUs", updateAboutUs);
 Router.post("/postComment", postComment);
 Router.post(

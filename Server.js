@@ -259,36 +259,36 @@ const adminBro = new AdminBro({
       },
     },
     GoogleAdsense,
-    {
-      resource: HowItWorks,
-      options: {
-        properties: {
-          body: {
-            type: "richtext",
-          },
-        },
-      },
-    },
-    {
-      resource: whyChooseUs,
-      options: {
-        properties: {
-          body: {
-            type: "richtext",
-          },
-        },
-      },
-    },
-    {
-      resource: accessibilityStatement,
-      options: {
-        properties: {
-          body: {
-            type: "richtext",
-          },
-        },
-      },
-    },
+    // {
+    //   resource: HowItWorks,
+    //   options: {navigation: false,isAccessible:false,isVisible:false,
+    //     properties: {
+    //       body: {
+    //         type: "richtext",
+    //       },
+    //     },
+    //   },
+    // },
+    // {
+    //   resource: whyChooseUs,
+    //   options: {
+    //     properties: {
+    //       body: {
+    //         type: "richtext",
+    //       },
+    //     },
+    //   },
+    // },
+    // {
+    //   resource: accessibilityStatement,
+    //   options: {
+    //     properties: {
+    //       body: {
+    //         type: "richtext",
+    //       },
+    //     },
+    //   },
+    // },
   ],
   locale,
   branding: {

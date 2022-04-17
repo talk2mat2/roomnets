@@ -10,7 +10,7 @@ exports.delete7daysRooms = async (req, res, next) => {
         const diffTime = Math.abs(date2 - date1);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        if (diffDays > 6 && !roomPost.isPaidAdd) {
+        if (diffDays > 14 && !roomPost.isPaidAdd) {
           //  await Rooms.deleteOne({_id:roomPost.id})
           expiredAdd.push(roomPost.id);
         }
@@ -34,7 +34,7 @@ exports.delete7daysApartment = async (req, resp, next) => {
         const diffTime = Math.abs(date2 - date1);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        if (diffDays > 6 && !roomPost.isPaidAdd) {
+        if (diffDays > 14 && !roomPost.isPaidAdd) {
           //  await Rooms.deleteOne({_id:roomPost.id})
           expiredAdd.push(roomPost.id);
         }

@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
 
 import { ApiClient } from "admin-bro";
-import { Box } from "@admin-bro/design-system";
+import {
+  Box,
+  RichText,
+  // DefaultQuillToolbarOptions,
+  // theme,
+} from "@admin-bro/design-system";
 import styled from "styled-components";
+
 import axios from "axios";
 const Line = styled.div`
   height: 1px;
@@ -94,6 +100,9 @@ const Dashboard = () => {
   const [ImageState, setImageState] = React.useState([]);
   const [country, setCountry] = React.useState("");
   const [faqVisible, setfaqVisible] = React.useState(false);
+  const [whyVisible, setWhyVisible] = React.useState(false);
+  const [howVisible, setHowVisible] = React.useState(false);
+  const [accessVisible, setAccessVisible] = React.useState(false);
   const [ImageState2, setImageState2] = React.useState({});
   const [ImageState3, setImageState3] = React.useState({});
   const [ImageState5, setImageState5] = React.useState({});
@@ -114,7 +123,7 @@ const Dashboard = () => {
   const [formResponse3, setFormResponse3] = React.useState({
     name: "",
     url: "",
-  
+
     image: "",
   });
   const [formResponse, setFormResponse] = React.useState({
@@ -124,6 +133,12 @@ const Dashboard = () => {
     aboutusTitle: "",
     privacyBody: "",
     privacyTitle: "",
+    whyTitle: "",
+    whyBody: "",
+    howTitle: "",
+    howBody: "",
+    accessTitle: "",
+    accessBody: "",
   });
 
   const countDocuments = async () => {
@@ -141,6 +156,45 @@ const Dashboard = () => {
       .post(`/api/v1/updateFaq`, {
         title: formResponse.question,
         body: formResponse.answer,
+      })
+      .then((response) => alert("success"))
+      .catch((err) => alert("failure"));
+  };
+  const postWhy= async () => {
+    if (!formResponse.whyTitle || !formResponse.whyBody) {
+      return alert("All fields are required");
+    }
+    setWhyVisible(false);
+    return await axios
+      .post(`/api/v1/PostWhyChooseUs`, {
+        title: formResponse.whyTitle,
+        body: formResponse.whyBody,
+      })
+      .then((response) => alert("success"))
+      .catch((err) => alert("failure"));
+  };
+  const postHow= async () => {
+    if (!formResponse.howTitle || !formResponse.howBody) {
+      return alert("All fields are required");
+    }
+    setHowVisible(false);
+    return await axios
+      .post(`/api/v1/PostHow`, {
+        title: formResponse.howTitle,
+        body: formResponse.howBody,
+      })
+      .then((response) => alert("success"))
+      .catch((err) => alert("failure"));
+  };
+  const postAccess= async () => {
+    if (!formResponse.accessTitle || !formResponse.accessBody) {
+      return alert("All fields are required");
+    }
+    setAccessVisible(false);
+    return await axios
+      .post(`/api/v1/PostAccess`, {
+        title: formResponse.accessTitle,
+        body: formResponse.accessBody,
       })
       .then((response) => alert("success"))
       .catch((err) => alert("failure"));
@@ -215,7 +269,6 @@ const Dashboard = () => {
   }
 
   function handleChange5(event) {
-   
     if (
       event.target.files[0].type === "image/png" ||
       event.target.files[0].type === "image/jpg" ||
@@ -242,8 +295,8 @@ const Dashboard = () => {
       return alert("You must select a target country");
     }
     var formData = new FormData();
-const countryData=JSON.stringify({country:country})
-formData.append('countryData',countryData)
+    const countryData = JSON.stringify({ country: country });
+    formData.append("countryData", countryData);
     for (let x = 0; x < ImageState.length; x++) {
       formData.append("file", ImageState[x]["Uri"]);
     }
@@ -315,6 +368,15 @@ formData.append('countryData',countryData)
   }, []);
   const handleFadedit = () => {
     setfaqVisible(true);
+  };
+  const handleWhyedit = () => {
+    setWhyVisible(true);
+  };
+  const handleHowedit = () => {
+    setHowVisible(true);
+  };
+  const handleAccessedit = () => {
+    setAccessVisible(true);
   };
   const handlePrivacy = () => {
     setPrivacy(true);
@@ -398,8 +460,8 @@ formData.append('countryData',countryData)
     })
       .then(function (response) {
         setloading(false);
-          console.log(response.data);
-          alert(response.data.message)
+        console.log(response.data);
+        alert(response.data.message);
       })
       .catch((err) => {
         setloading(false);
@@ -407,12 +469,12 @@ formData.append('countryData',countryData)
       });
   };
   const CreateSliderImages = async (e) => {
- e.preventDefault()
+    e.preventDefault();
     if (!ImageState5.Uri) {
       return alert("You must select at least one  slider Image");
     }
     var formData = new FormData();
-    
+
     // formData.append("userData", JSON.stringify(formResponse3));
     // for (let x = 0; x < ImageState.length; x++) {
     formData.append("file", ImageState5["Uri"]);
@@ -431,9 +493,9 @@ formData.append('countryData',countryData)
     })
       .then(function (response) {
         setloading(false);
-          console.log(response.data);
-          alert(response.data.message)
-          setImageState5({})
+        console.log(response.data);
+        alert(response.data.message);
+        setImageState5({});
       })
       .catch((err) => {
         setloading(false);
@@ -467,8 +529,8 @@ formData.append('countryData',countryData)
     })
       .then(function (response) {
         setloading(false);
-          console.log(response.data);
-          alert(response.data.message)
+        console.log(response.data);
+        alert(response.data.message);
       })
       .catch((err) => {
         setloading(false);
@@ -479,8 +541,16 @@ formData.append('countryData',countryData)
   return (
     <Box variant="grey">
       {/* <Box variant="white">some: {data.some}</Box> */}
-      <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)",boxShadow: "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px"}} variant="white">
-        <h2  style={{fontWeight:"bold"}}
+      <Box
+        style={{
+          backgroundImage: "linear-gradient(#fdfbfb ,  #ebedee)",
+          boxShadow:
+            "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px",
+        }}
+        variant="white"
+      >
+        <h2
+          style={{ fontWeight: "bold" }}
           font-size="xl"
           className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
           font-weight="normal"
@@ -522,7 +592,7 @@ formData.append('countryData',countryData)
           <br />
           <label>Answer</label>
           <br />
-
+          <RichText quill={{}} />
           <textarea
             value={formResponse.answer}
             onChange={(e) =>
@@ -536,6 +606,189 @@ formData.append('countryData',countryData)
           <br />
           <br />
           <button onClick={postFaq}>
+            <span
+              className="sc-giAqnE dqTeSL admin-bro_Icon"
+              color="grey100"
+            ></span>
+            Publish
+          </button>
+        </FaqDiv>
+      ) : null}
+      {whyVisible ? (
+        <FaqDiv>
+          <div
+            onClick={() => setWhyVisible(false)}
+            style={{
+              float: "right",
+              cursor: "pointer",
+              color: "tomato",
+            }}
+          >
+            <h1>x</h1>
+          </div>
+          <br />
+          <br />
+
+          <label>Title</label>
+          <input
+            type="text"
+            value={formResponse.whyTitle}
+            onChange={(e) =>
+              setFormResponse({
+                ...formResponse,
+                whyTitle: e.target.value,
+              })
+            }
+          />
+
+          <br />
+          <br />
+          <br />
+          <label>Body</label>
+          <br />
+          <br />
+          <br />
+          <RichText
+            onChange={(text) =>
+              setFormResponse({ ...formResponse, whyBody: text })
+            }
+            quill={{}}
+          />
+          {/* <textarea
+            value={formResponse.answer}
+            onChange={(e) =>
+              setFormResponse({
+                ...formResponse,
+                answer: e.target.value,
+              })
+            }
+            rows={10}
+          ></textarea> */}
+
+          <br />
+          <button onClick={postWhy}>
+            <span
+              className="sc-giAqnE dqTeSL admin-bro_Icon"
+              color="grey100"
+            ></span>
+            Publish
+          </button>
+        </FaqDiv>
+      ) : null}
+      {howVisible ? (
+        <FaqDiv>
+          <div
+            onClick={() => setHowVisible(false)}
+            style={{
+              float: "right",
+              cursor: "pointer",
+              color: "tomato",
+            }}
+          >
+            <h1>x</h1>
+          </div>
+          <br />
+          <br />
+
+          <label>Title</label>
+          <input
+            type="text"
+            value={formResponse.howTitle}
+            onChange={(e) =>
+              setFormResponse({
+                ...formResponse,
+                howTitle: e.target.value,
+              })
+            }
+          />
+
+          <br />
+          <br />
+          <br />
+          <label>Body</label>
+          <br />
+          <br />
+          <br />
+          <RichText
+            onChange={(text) =>
+              setFormResponse({ ...formResponse, howBody: text })
+            }
+            quill={{}}
+          />
+          {/* <textarea
+            value={formResponse.answer}
+            onChange={(e) =>
+              setFormResponse({
+                ...formResponse,
+                answer: e.target.value,
+              })
+            }
+            rows={10}
+          ></textarea> */}
+
+          <br />
+          <button onClick={postHow}>
+            <span
+              className="sc-giAqnE dqTeSL admin-bro_Icon"
+              color="grey100"
+            ></span>
+            Publish
+          </button>
+        </FaqDiv>
+      ) : null}
+      {accessVisible ? (
+        <FaqDiv>
+          <div
+            onClick={() => setAccessVisible(false)}
+            style={{
+              float: "right",
+              cursor: "pointer",
+              color: "tomato",
+            }}
+          >
+            <h1>x</h1>
+          </div>
+          <br />
+          <br />
+
+          <label>Title</label>
+          <input
+            type="text"
+            value={formResponse.accessTitle}
+            onChange={(e) =>
+              setFormResponse({
+                ...formResponse,
+                accessTitle: e.target.value,
+              })
+            }
+          />
+
+          <br />
+          <br />
+          <br />
+          <label>Body</label>
+          <br />
+          <br />
+          <br />
+          <RichText
+            onChange={(text) =>
+              setFormResponse({ ...formResponse, accessBody: text })
+            }
+            quill={{}}
+          />
+          {/* <textarea
+            value={formResponse.answer}
+            onChange={(e) =>
+              setFormResponse({
+                ...formResponse,
+                answer: e.target.value,
+              })
+            }
+            rows={10}
+          ></textarea> */}
+
+          <br />
+          <button onClick={postAccess}>
             <span
               className="sc-giAqnE dqTeSL admin-bro_Icon"
               color="grey100"
@@ -648,7 +901,7 @@ formData.append('countryData',countryData)
       {/* edit blog post */}
 
       {blogpost ? (
-        <FaqDiv >
+        <FaqDiv>
           <div
             onClick={() => setBlogpost(false)}
             style={{
@@ -729,9 +982,7 @@ formData.append('countryData',countryData)
                 }
                 value={formResponse2.country}
               >
-                <option value="NG">
-                  --Select Country*--
-                </option>
+                <option value="NG">--Select Country*--</option>
                 <option value="NG">Nigeria</option>
                 <option value="GH">Ghana</option>
                 <option value="KE">Kenya</option>
@@ -752,8 +1003,8 @@ formData.append('countryData',countryData)
           </button>
         </FaqDiv>
       ) : null}
-          {Partners ? (
-        <FaqDiv >
+      {Partners ? (
+        <FaqDiv>
           <div
             onClick={() => setPartners(false)}
             style={{
@@ -767,13 +1018,13 @@ formData.append('countryData',countryData)
 
           <div>
             <h2 style={{ fontWeight: "bold", textAlign: "center" }}>
-             Add new site partners
+              Add new site partners
             </h2>
           </div>
 
           <br />
           <label>
-            Partner Name <sup style={{color:"tomato"}}>*</sup>
+            Partner Name <sup style={{ color: "tomato" }}>*</sup>
           </label>
           <input
             type="text"
@@ -790,7 +1041,7 @@ formData.append('countryData',countryData)
           <br />
           <br />
           <label>
-            Partner Url  <sup style={{color:"tomato"}}>*</sup>
+            Partner Url <sup style={{ color: "tomato" }}>*</sup>
           </label>
           <br />
           <input
@@ -812,7 +1063,6 @@ formData.append('countryData',countryData)
               justifyContent: "space-between",
             }}
           >
-           
             <div>
               <p>Select Image Logo</p>
               <input
@@ -823,7 +1073,6 @@ formData.append('countryData',countryData)
               />
             </div>
             <div>
-           
               <br />
               <br />
               <br />
@@ -1304,9 +1553,17 @@ formData.append('countryData',countryData)
         </div> */}
 
         <br />
-        <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)",boxShadow: "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px"}} variant="white">
+        <Box
+          style={{
+            backgroundImage: "linear-gradient(#fdfbfb ,  #ebedee)",
+            boxShadow:
+              "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px",
+          }}
+          variant="white"
+        >
           {loading ? <p>..Uploading</p> : null}
-          <h5  style={{fontWeight:"bold"}}
+          <h5
+            style={{ fontWeight: "bold" }}
             font-size="sm"
             className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
             font-weight="normal"
@@ -1334,74 +1591,82 @@ formData.append('countryData',countryData)
             <br />
             <br />
           </small>
-          <div style={{
+          <div
+            style={{
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
-            }}>
-          <input
-            type="file"
-            onChange={handleChange}
-            accept="image/x-png,image/jpeg,image/gif"
-          />
-             <Select
-                onChange={(e) =>
-                  setCountry(
-                   e.target.value,
-                  )
-                }
-                value={country}
-              >
-                <option value="">
-                  --Select Country*--
-                </option>
-                <option value="NG">Nigeria</option>
-                <option value="GH">Ghana</option>
-                <option value="KE">Kenya</option>
-                <option value="US">USA</option>
-                <option value="ZA">South-Africa</option>
-                <option value="IE">Ireland</option>
-                <option value="GB">UK</option>
-              </Select>
-          <button
-            type="submit"
-            href="/admin"
-            data-testid="action-new"
-            className="sc-gtssRu sc-dvXXZy kGJZae eAtiBe admin-bro_ButtonGroupItem admin-bro_Button admin-bro_ButtonGroupItem"
+            }}
           >
-            <span className="sc-giAqnE dqTeSL admin-bro_Icon" color="grey100">
-              <svg
-                focusable="false"
-                preserveAspectRatio="xMidYMid meet"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                width="16"
-                height="16"
-                viewBox="0 0 32 32"
-                aria-hidden="true"
-              >
-                <path d="M17 15L17 8 15 8 15 15 8 15 8 17 15 17 15 24 17 24 17 17 24 17 24 15z"></path>
-              </svg>
-            </span>
-            Upload
-          </button>
-        </div>
+            <input
+              type="file"
+              onChange={handleChange}
+              accept="image/x-png,image/jpeg,image/gif"
+            />
+            <Select
+              onChange={(e) => setCountry(e.target.value)}
+              value={country}
+            >
+              <option value="">--Select Country*--</option>
+              <option value="NG">Nigeria</option>
+              <option value="GH">Ghana</option>
+              <option value="KE">Kenya</option>
+              <option value="US">USA</option>
+              <option value="ZA">South-Africa</option>
+              <option value="IE">Ireland</option>
+              <option value="GB">UK</option>
+            </Select>
+            <button
+              type="submit"
+              href="/admin"
+              data-testid="action-new"
+              className="sc-gtssRu sc-dvXXZy kGJZae eAtiBe admin-bro_ButtonGroupItem admin-bro_Button admin-bro_ButtonGroupItem"
+            >
+              <span className="sc-giAqnE dqTeSL admin-bro_Icon" color="grey100">
+                <svg
+                  focusable="false"
+                  preserveAspectRatio="xMidYMid meet"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 32 32"
+                  aria-hidden="true"
+                >
+                  <path d="M17 15L17 8 15 8 15 15 8 15 8 17 15 17 15 24 17 24 17 17 24 17 24 15z"></path>
+                </svg>
+              </span>
+              Upload
+            </button>
+          </div>
 
-        <br/>
-          <small style={{color:"tomato"}}>**To delete Banners image  navigate to homepage models and click edit then<br/> delete banner for a choosen country</small>
+          <br />
+          <small style={{ color: "tomato" }}>
+            **To delete Banners image navigate to homepage models and click edit
+            then
+            <br /> delete banner for a choosen country
+          </small>
         </Box>
       </form>
-      <br/>
+      <br />
 
-      <form onSubmit={CreateSliderImages }>
-      <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)",boxShadow: "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px"}} variant="white">
+      <form onSubmit={CreateSliderImages}>
+        <Box
+          style={{
+            backgroundImage: "linear-gradient(#fdfbfb ,  #ebedee)",
+            boxShadow:
+              "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px",
+          }}
+          variant="white"
+        >
           {loading ? <p>..Uploading</p> : null}
-          <h5  style={{fontWeight:"bold"}}
+          <h5
+            style={{ fontWeight: "bold" }}
             font-size="sm"
             className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
             font-weight="normal"
           >
-         Home Page Sliders
+            Home Page Sliders
           </h5>
           <Line />
           <div
@@ -1416,57 +1681,67 @@ formData.append('countryData',countryData)
           <br />
 
           <small className="sc-dIvqjp  sc-fKgIG">
-            <i>Add slider images to landing page sliders</i> <br/>
-            <i  style={{fontWeight:"bold"}}>*Image size:1920 *900</i>
-       
-       
+            <i>Add slider images to landing page sliders</i> <br />
+            <i style={{ fontWeight: "bold" }}>*Image size:1920 *900</i>
             <br />
             <br />
           </small>
-          <div style={{
+          <div
+            style={{
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
-            }}>
-          <input
-            type="file"
-            onChange={handleChange5}
-            accept="image/x-png,image/jpeg,image/gif"
-          />
-          
-          <button
-            type="submit"
-      
-            href="/admin"
-            data-testid="action-new"
-            className="sc-gtssRu sc-dvXXZy kGJZae eAtiBe admin-bro_ButtonGroupItem admin-bro_Button admin-bro_ButtonGroupItem"
+            }}
           >
-            <span className="sc-giAqnE dqTeSL admin-bro_Icon" color="grey100">
-              <svg
-                focusable="false"
-                preserveAspectRatio="xMidYMid meet"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                width="16"
-                height="16"
-                viewBox="0 0 32 32"
-                aria-hidden="true"
-              >
-                <path d="M17 15L17 8 15 8 15 15 8 15 8 17 15 17 15 24 17 24 17 17 24 17 24 15z"></path>
-              </svg>
-            </span>
-            Upload
-          </button>
-      
-        </div>
-        <br/>
-          <small style={{color:"tomato"}}>**To delete Sliders image  navigate to homepage models and click edit and delete<br/> from sliders</small>
+            <input
+              type="file"
+              onChange={handleChange5}
+              accept="image/x-png,image/jpeg,image/gif"
+            />
+
+            <button
+              type="submit"
+              href="/admin"
+              data-testid="action-new"
+              className="sc-gtssRu sc-dvXXZy kGJZae eAtiBe admin-bro_ButtonGroupItem admin-bro_Button admin-bro_ButtonGroupItem"
+            >
+              <span className="sc-giAqnE dqTeSL admin-bro_Icon" color="grey100">
+                <svg
+                  focusable="false"
+                  preserveAspectRatio="xMidYMid meet"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 32 32"
+                  aria-hidden="true"
+                >
+                  <path d="M17 15L17 8 15 8 15 15 8 15 8 17 15 17 15 24 17 24 17 17 24 17 24 15z"></path>
+                </svg>
+              </span>
+              Upload
+            </button>
+          </div>
+          <br />
+          <small style={{ color: "tomato" }}>
+            **To delete Sliders image navigate to homepage models and click edit
+            and delete
+            <br /> from sliders
+          </small>
         </Box>
-        </form>
+      </form>
       <br />
       <br />
-      <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)",boxShadow: "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px"}} variant="white">
-        <h5  style={{fontWeight:"bold"}}
+      <Box
+        style={{
+          backgroundImage: "linear-gradient(#fdfbfb ,  #ebedee)",
+          boxShadow:
+            "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px",
+        }}
+        variant="white"
+      >
+        <h5
+          style={{ fontWeight: "bold" }}
           font-size="sm"
           className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
           font-weight="normal"
@@ -1489,12 +1764,34 @@ formData.append('countryData',countryData)
             </h6>
             <br />
           </ul>
+          <ul>
+            <h6>
+              Why Chooseus <button onClick={handleWhyedit}>+Add</button>
+            </h6>
+            <br />
+            <h6>
+              How It Works <button onClick={handleHowedit}>+Edit</button>
+            </h6>
+            <br />
+            <h6>
+              Accessibility statement <button onClick={handleAccessedit}>+Edit</button>
+            </h6>
+            <br />
+          </ul>
         </Box>
       </Box>
 
       <br />
-      <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)",boxShadow: "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px"}} variant="white">
-        <h5 style={{fontWeight:"bold"}}
+      <Box
+        style={{
+          backgroundImage: "linear-gradient(#fdfbfb ,  #ebedee)",
+          boxShadow:
+            "rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px",
+        }}
+        variant="white"
+      >
+        <h5
+          style={{ fontWeight: "bold" }}
           font-size="sm"
           className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
           font-weight="normal"
@@ -1502,7 +1799,7 @@ formData.append('countryData',countryData)
           Blog Posts
         </h5>
         <Line />
-        <Box >
+        <Box>
           <button
             type="submit"
             onClick={handleBlog}
@@ -1528,14 +1825,18 @@ formData.append('countryData',countryData)
         </Box>
       </Box>
       <br />
-      <Box style={{backgroundImage:"linear-gradient(#fdfbfb ,  #ebedee)"}} variant="white">
-        <h5  style={{fontWeight:"bold"}}
+      <Box
+        style={{ backgroundImage: "linear-gradient(#fdfbfb ,  #ebedee)" }}
+        variant="white"
+      >
+        <h5
+          style={{ fontWeight: "bold" }}
           font-size="sm"
           className="sc-dIvqjp lbrNjM sc-fKgIGh admin-bro_Header admin-bro_H5"
           font-weight="normal"
         >
-         Site Partners 
-        </h5>  
+          Site Partners
+        </h5>
         <Line />
         <Box>
           <button
@@ -1544,13 +1845,16 @@ formData.append('countryData',countryData)
             data-testid="action-new"
             className="sc-gtssRu sc-dvXXZy kGJZae eAtiBe admin-bro_ButtonGroupItem admin-bro_Button admin-bro_ButtonGroupItem"
           >
-        
-           + Add new
+            + Add new
           </button>
-          <br/>
-          <br/>
-          <br/>
-          <small style={{color:"tomato"}}>**To delete partners navigate to homepage models and click edit and delete from <br/>partners</small>
+          <br />
+          <br />
+          <br />
+          <small style={{ color: "tomato" }}>
+            **To delete partners navigate to homepage models and click edit and
+            delete from <br />
+            partners
+          </small>
         </Box>
       </Box>
       <br />

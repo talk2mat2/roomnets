@@ -24,6 +24,7 @@ const fs = require("fs");
 // var child_process = require("child_process");
 const Grid = require("gridfs-stream");
 const mongoose = require("mongoose");
+const howItWorks = require("../models/howItWorks");
 // const homepageModel = require("../models/homepageModel");
 
 let gfs;
@@ -581,6 +582,7 @@ exports.media = async (req, res) => {
 
 //list rooms
 exports.ListRoomsByState = async (req, res) => {
+  // console.log("called");
   const params = req.params.state
     ? {
         Approved_By_Admin: true,
@@ -603,7 +605,8 @@ exports.ListRoomsByState = async (req, res) => {
     .populate("posted_by", "-Password")
     .limit(limit)
     .skip(skip)
-    .sort({ isPaidAdd: -1, created_at: -1, isTopAdd: -1 })
+    // .sort({ isPaidAdd: -1, created_at: -1, isTopAdd: -1 })
+    .sort({ isTopAdd: -1, created_at: 1 })
     .then((response) => {
       return res.status(200).send({
         status: true,
@@ -626,11 +629,19 @@ exports.ListRoomsByState = async (req, res) => {
 
 exports.ListRoomsByMe = async (req, res) => {
   const country = req.query.country;
-  const params = { posted_by: req.body.id, country };
-
+  let params;
+  // const params = { posted_by: req.body.id, country };
+  //free users can see their add only if its 7 days old
+  const user = await UserSchema.findById(req.body.id);
+  if (user && user.plans == "Basic") {
+    var now = new Date();
+    now = new Date(now.setDate(now.getDate() - 7));
+    params = { posted_by: req.body.id, country, created_at: { $lte: now } };
+  } else {
+    params = { posted_by: req.body.id, country };
+  }
   let total = await Rooms.countDocuments(params);
   const limit = 15;
-
   var pageNo = req.query.pageNo || 0;
 
   var skip = pageNo * limit;
@@ -656,6 +667,7 @@ exports.ListRoomsByMe = async (req, res) => {
 };
 //liat  Apartments
 exports.ListApartByState = async (req, res) => {
+  console.log("apart");
   const params = req.params.state
     ? {
         Approved_By_Admin: true,
@@ -677,7 +689,8 @@ exports.ListApartByState = async (req, res) => {
     .populate("posted_by", "-Password")
     .limit(limit)
     .skip(skip)
-    .sort({ isPaidAdd: -1, created_at: -1, isTopAdd: -1 })
+    // .sort({ isPaidAdd: -1, created_at: -1, isTopAdd: -1 })
+    .sort({ isTopAdd: -1, created_at: 1 })
     .then((response) => {
       return res.status(200).send({
         status: true,
@@ -734,7 +747,18 @@ exports.ListApartByState = async (req, res) => {
 exports.ListApartByMe = async (req, res) => {
   // console.log("called")
   const country = req.query.country;
-  const params = { posted_by: req.body.id, country };
+
+  let params;
+  // const params = { posted_by: req.body.id, country };
+  //free users can see their add only if its 7 days old
+  const user = await UserSchema.findById(req.body.id);
+  if (user && user.plans == "Basic") {
+    var now = new Date();
+    now = new Date(now.setDate(now.getDate() - 7));
+    params = { posted_by: req.body.id, country, created_at: { $lte: now } };
+  } else {
+    params = { posted_by: req.body.id, country };
+  }
 
   let total = await Apartments.countDocuments(params);
   const limit = 15;
@@ -747,7 +771,7 @@ exports.ListApartByMe = async (req, res) => {
     .populate("posted_by", "-Password")
     .limit(limit)
     .skip(skip)
-    .sort({ isPaidAdd: -1, created_at: -1 })
+    .sort({})
     .then((response) => {
       return res.status(200).send({
         status: true,
@@ -843,7 +867,8 @@ exports.ListRoomsByLocation = async (req, res) => {
     .populate("posted_by", "-Password")
     .limit(limit)
     .skip(skip)
-    .sort({ isPaidAdd: -1, created_at: -1 })
+    // .sort({ isPaidAdd: -1, created_at: 1 })
+    .sort({ isTopAdd: -1, created_at: 1 })
     .then((response) => {
       return res.status(200).send({
         status: true,
@@ -885,7 +910,8 @@ exports.ListApartByLocation = async (req, res) => {
     .populate("posted_by", "-Password")
     .limit(limit)
     .skip(skip)
-    .sort({ isPaidAdd: -1, created_at: -1 })
+    // .sort({ isPaidAdd: -1, created_at: -1 })
+    .sort({ isTopAdd: -1, created_at: 1 })
     .then((response) => {
       return res.status(200).send({
         status: true,
@@ -933,7 +959,9 @@ exports.ListRoomsByLnglat = async (req, res) => {
             distanceField: "distance",
           },
         },
-        { $sort: { isPaidAdd: -1, distance: 1, created_at: -1 } },
+        // { $sort: { isPaidAdd: -1, distance: 1, created_at: -1 } },
+        // { $sort: { created_at: 1 } },
+        { $sort: { isTopAdd: -1, created_at: 1 } },
         { $limit: limit },
         { $unset: "Password" },
         { $skip: skip },
@@ -1017,7 +1045,8 @@ exports.ListApartByLnglat = async (req, res) => {
             distanceField: "distance",
           },
         },
-        { $sort: { isPaidAdd: -1, distance: 1, created_at: -1 } },
+        // { $sort: { isPaidAdd: -1, distance: 1, created_at: -1 } },
+        { $sort: { isTopAdd: -1, created_at: 1 } },
         { $limit: 7 },
         { $unset: "Password" },
         { $skip: skip },
@@ -2307,4 +2336,61 @@ exports.fetchWhyChooseUs = async (req, res) => {
         status: false,
       });
     });
+};
+exports.PostWhyChooseUs = async (req, res) => {
+ 
+  const { title, body } = req.body;
+  // console.log(title,body)
+  if (!title || !body) {
+    console.log('no title and body')
+    return res.status(400).send({
+      message: "An error occured,unable to subscribe",
+      status: false,
+    });
+  } else {
+    const newWhyUs = new WhyChooseUs({ title, body });
+    await newWhyUs.save();
+    return res.status(200).json({
+      status: true,
+      message: "success",
+    });
+  }
+};
+exports.PostHow = async (req, res) => {
+ 
+  const { title, body } = req.body;
+  // console.log(title,body)
+  if (!title || !body) {
+    console.log('no title and body')
+    return res.status(400).send({
+      message: "An error occured,unable to subscribe",
+      status: false,
+    });
+  } else {
+    const newHow = new howItWorks({ title, body });
+    await newHow.save();
+    return res.status(200).json({
+      status: true,
+      message: "success",
+    });
+  }
+};
+exports.PostAccess = async (req, res) => {
+ 
+  const { title, body } = req.body;
+  // console.log(title,body)
+  if (!title || !body) {
+    console.log('no title and body')
+    return res.status(400).send({
+      message: "An error occured,unable to subscribe",
+      status: false,
+    });
+  } else {
+    const newAccess = new Accesibility({ title, body });
+    await newAccess.save();
+    return res.status(200).json({
+      status: true,
+      message: "success",
+    });
+  }
 };
