@@ -1204,7 +1204,7 @@ exports.updatePrivacy = async (req, res) => {
     // console.log(isHomeExist)
     await HomepageModels.findOneAndUpdate(
       { name: "home" },
-      { privacy: [...isHomeExist.privacy, { title, body }] },
+      { privacy: [{ title, body }] },
       {
         returnOriginal: false,
         useFindAndModify: false,
@@ -1244,7 +1244,7 @@ exports.updateFaq = async (req, res) => {
     // console.log(isHomeExist)
     await HomepageModels.findOneAndUpdate(
       { name: "home" },
-      { faq: [...isHomeExist.faq, { title, body }] },
+      { faq: [{ title, body }] },
       {
         returnOriginal: false,
         useFindAndModify: false,
@@ -1284,7 +1284,7 @@ exports.updateAboutUs = async (req, res) => {
     // console.log(isHomeExist)
     await HomepageModels.findOneAndUpdate(
       { name: "home" },
-      { aboutUs: [...isHomeExist.aboutUs, { title, body }] },
+      { aboutUs: [{ title, body }] },
       {
         returnOriginal: false,
         useFindAndModify: false,
@@ -2338,16 +2338,16 @@ exports.fetchWhyChooseUs = async (req, res) => {
     });
 };
 exports.PostWhyChooseUs = async (req, res) => {
- 
   const { title, body } = req.body;
   // console.log(title,body)
   if (!title || !body) {
-    console.log('no title and body')
+    console.log("no title and body");
     return res.status(400).send({
       message: "An error occured,unable to subscribe",
       status: false,
     });
   } else {
+    await WhyChooseUs.deleteMany({});
     const newWhyUs = new WhyChooseUs({ title, body });
     await newWhyUs.save();
     return res.status(200).json({
@@ -2357,16 +2357,16 @@ exports.PostWhyChooseUs = async (req, res) => {
   }
 };
 exports.PostHow = async (req, res) => {
- 
   const { title, body } = req.body;
   // console.log(title,body)
   if (!title || !body) {
-    console.log('no title and body')
+    console.log("no title and body");
     return res.status(400).send({
       message: "An error occured,unable to subscribe",
       status: false,
     });
   } else {
+    await howItWorks.deleteMany({});
     const newHow = new howItWorks({ title, body });
     await newHow.save();
     return res.status(200).json({
@@ -2376,16 +2376,16 @@ exports.PostHow = async (req, res) => {
   }
 };
 exports.PostAccess = async (req, res) => {
- 
   const { title, body } = req.body;
   // console.log(title,body)
   if (!title || !body) {
-    console.log('no title and body')
+    console.log("no title and body");
     return res.status(400).send({
       message: "An error occured,unable to subscribe",
       status: false,
     });
   } else {
+    await Accesibility.deleteMany({});
     const newAccess = new Accesibility({ title, body });
     await newAccess.save();
     return res.status(200).json({

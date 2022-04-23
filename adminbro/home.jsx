@@ -160,7 +160,7 @@ const Dashboard = () => {
       .then((response) => alert("success"))
       .catch((err) => alert("failure"));
   };
-  const postWhy= async () => {
+  const postWhy = async () => {
     if (!formResponse.whyTitle || !formResponse.whyBody) {
       return alert("All fields are required");
     }
@@ -173,7 +173,7 @@ const Dashboard = () => {
       .then((response) => alert("success"))
       .catch((err) => alert("failure"));
   };
-  const postHow= async () => {
+  const postHow = async () => {
     if (!formResponse.howTitle || !formResponse.howBody) {
       return alert("All fields are required");
     }
@@ -186,7 +186,7 @@ const Dashboard = () => {
       .then((response) => alert("success"))
       .catch((err) => alert("failure"));
   };
-  const postAccess= async () => {
+  const postAccess = async () => {
     if (!formResponse.accessTitle || !formResponse.accessBody) {
       return alert("All fields are required");
     }
@@ -592,8 +592,17 @@ const Dashboard = () => {
           <br />
           <label>Answer</label>
           <br />
-          <RichText quill={{}} />
-          <textarea
+          <RichText
+            onChange={(text) =>
+              setFormResponse({
+                ...formResponse,
+                answer: text,
+              })
+            }
+            value={formResponse.answer}
+            quill={{}}
+          />
+          {/* <textarea
             value={formResponse.answer}
             onChange={(e) =>
               setFormResponse({
@@ -602,7 +611,7 @@ const Dashboard = () => {
               })
             }
             rows={10}
-          ></textarea>
+          ></textarea> */}
           <br />
           <br />
           <button onClick={postFaq}>
@@ -826,8 +835,10 @@ const Dashboard = () => {
 
           <label>Body</label>
           <br />
+          <br />
+          <br />
 
-          <textarea
+          {/* <textarea
             value={formResponse.privacyBody}
             onChange={(e) =>
               setFormResponse({
@@ -836,7 +847,17 @@ const Dashboard = () => {
               })
             }
             rows={15}
-          ></textarea>
+          ></textarea> */}
+          <RichText
+            quill={{}}
+            onChange={(text) =>
+              setFormResponse({
+                ...formResponse,
+                privacyBody: text,
+              })
+            }
+            value={formResponse.privacyBody}
+          />
           <br />
           <br />
           <button onClick={postPrivacy}>
@@ -876,17 +897,18 @@ const Dashboard = () => {
 
           <label>Body</label>
           <br />
-
-          <textarea
-            value={formResponse.aboutusBody}
-            onChange={(e) =>
+          <br />
+          <br />
+          <RichText
+            quill={{}}
+            onChange={(text) =>
               setFormResponse({
                 ...formResponse,
-                aboutusBody: e.target.value,
+                aboutusBody: text,
               })
             }
-            rows={15}
-          ></textarea>
+            value={formResponse.aboutusBody}
+          />
           <br />
           <br />
           <button onClick={postAboutUs}>
@@ -1774,7 +1796,8 @@ const Dashboard = () => {
             </h6>
             <br />
             <h6>
-              Accessibility statement <button onClick={handleAccessedit}>+Edit</button>
+              Accessibility statement{" "}
+              <button onClick={handleAccessedit}>+Edit</button>
             </h6>
             <br />
           </ul>
