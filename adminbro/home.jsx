@@ -105,7 +105,7 @@ const Dashboard = () => {
   const [accessVisible, setAccessVisible] = React.useState(false);
   const [ImageState2, setImageState2] = React.useState({});
   const [ImageState3, setImageState3] = React.useState({});
-  const [ImageState5, setImageState5] = React.useState({});
+  const [ImageState5, setImageState5] = React.useState([]);
   const [Privacy, setPrivacy] = React.useState(false);
 
   const [blogpost, setBlogpost] = React.useState(false);
@@ -277,10 +277,12 @@ const Dashboard = () => {
     ) {
       if (event.target.files[0]) {
         // const newImagestate = ImageState;
-        setImageState5({
+        const newImage = {
           file: URL.createObjectURL(event.target.files[0]),
           Uri: event.target.files[0],
-        });
+        };
+
+        setImageState5([...ImageState5, newImage]);
       }
     } else {
       return alert("select a valid image format");
@@ -470,14 +472,16 @@ const Dashboard = () => {
   };
   const CreateSliderImages = async (e) => {
     e.preventDefault();
-    if (!ImageState5.Uri) {
+    if (!ImageState5.length) {
       return alert("You must select at least one  slider Image");
     }
     var formData = new FormData();
 
     // formData.append("userData", JSON.stringify(formResponse3));
     // for (let x = 0; x < ImageState.length; x++) {
-    formData.append("file", ImageState5["Uri"]);
+    for (let i = 0; i < ImageState5.length; i++) {
+      formData.append("file", ImageState5[i]["Uri"]);
+    }
 
     // dispatch(SETPOSTROOMPROCESS(formResponse));
     setloading(true);
@@ -1701,13 +1705,13 @@ const Dashboard = () => {
             {/* {mapImagestate()} */}
           </div>
           <br />
-
           <small className="sc-dIvqjp  sc-fKgIG">
             <i>Add slider images to landing page sliders</i> <br />
             <i style={{ fontWeight: "bold" }}>*Image size:1920 *900</i>
             <br />
             <br />
           </small>
+          <h3>{ImageState5?.length}</h3> images selected for upload
           <div
             style={{
               display: "flex",

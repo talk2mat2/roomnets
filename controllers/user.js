@@ -1461,21 +1461,25 @@ exports.createSliders = async (req, res) => {
   if (req.files.length > 0) {
     for (const file of req.files) {
       let img = {
-        uri: `${process.env.WEB_URL}` + "/api/v1/media/" + file.filename,
+        imagUri: `${process.env.WEB_URL}` + "/api/v1/media/" + file.filename,
       };
       newFiles.push(img);
     }
   }
-  let params =
-    req.files.length > 0
-      ? {
-          imagUri: newFiles[0]["uri"],
-        }
-      : {};
+  // let params =
+  //   req.files.length > 0
+  //     ? {
+  //         imagUri: newFiles[0]["uri"],
+  //       }
+  //     : {};
+  let params = req.files.length > 0 ? newFiles : [];
+
+  console.log(params)
 
   const isHomeExist = await HomepageModels.findOne({ name: "home" });
   if (isHomeExist) {
-    await isHomeExist.updateOne({ sliders: [...isHomeExist.sliders, params] });
+    // await isHomeExist.updateOne({ sliders: [...isHomeExist.sliders, params] });
+    await isHomeExist.updateOne({ sliders: [...params ]});
 
     return res.status(201).send({
       status: true,
@@ -1485,7 +1489,7 @@ exports.createSliders = async (req, res) => {
   if (!isHomeExist) {
     const newHomepageModels = new HomepageModels({
       name: "home",
-      sliders: [params],
+      sliders: [...params],
     });
     await newHomepageModels.save();
     return res.status(201).send({
@@ -2131,7 +2135,9 @@ exports.deleteItemApartment = async (req, res) => {
   const item = req.query.item;
   await Apartments.findByIdAndDelete(item)
     .then((response) => {
-      return res.status(200).json({ message: "success", status: true ,response:responses});
+      return res
+        .status(200)
+        .json({ message: "success", status: true, response: responses });
     })
     .catch((error) => {
       console.log(error);
